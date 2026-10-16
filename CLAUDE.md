@@ -26,7 +26,8 @@
 ## 실행
 - `실행.bat` 더블클릭 → `http://localhost:8765` 로 열림 (npx http-server, `-a localhost` 필수).
 - 카카오 JavaScript 키는 `localhost:8765` 에만 등록되어 있다. `127.0.0.1` 이나 `index.html` 더블클릭(file://)으로는 지도가 안 나온다.
-- 인터넷에 올리면 그 주소를 developers.kakao.com 의 JavaScript 키 도메인에 추가해야 한다.
+- **인터넷 주소**: https://ms89gmpy88-netizen.github.io/jemulpo-welfare-map/ (GitHub Pages, main 브랜치 / root). `git push` 하면 몇 분 뒤 반영된다.
+- 카카오 JavaScript 키 도메인에 `http://localhost:8765`, `https://ms89gmpy88-netizen.github.io` 가 등록되어 있다. 다른 주소로 옮기면 그 주소도 추가해야 한다.
 
 ## 자료를 바꿀 때
 1. `data/` 의 CSV를 고친다.
@@ -56,10 +57,9 @@
 - 카카오 지도: 분야별 색 표시(메뉴 색 점 = 범례), 숫자 묶음, 표시를 누르면 상세정보 창
 - 상세정보 창: 사진(허락받은 것만, 없으면 홈페이지 링크), 이용 방법, 주소·연락처·홈페이지·운영주체 구분·시설 종류·법인명·대상·하는 일·운영, 이용 편의, 지도에서 보기·카카오맵 길찾기
 - 📍 내 주변 가까운 순(위치 권한 필요), 🗺️ 지도 접기/펴기, '가 글씨 크게'(localStorage 기억)
-- git 저장소(main). 커밋 이름 jnuniv01. `.playwright-mcp/`는 제외
+- git 저장소(main). 커밋 이름 jnuniv01. `.playwright-mcp/`는 제외. GitHub: ms89gmpy88-netizen/jemulpo-welfare-map (Public — 비밀 파일을 올리지 않게 주의)
 
 ## 남은 일 / 다음 후보
-- **인터넷에 올리기**(GitHub Pages 추천): 사용자가 GitHub 가입 → 올린 주소를 카카오 JavaScript 키 도메인에 추가. 그래야 휴대폰 '내 주변'·카카오톡 공유를 제대로 쓸 수 있다.
 - **이용편의 자료**: 2026-10-16 API로 83곳 채움. 나머지는 API 자료에 건물이 없음(이 지역 등록 건물 135곳뿐).
 - **사진**: 사용자가 기관 허락을 받아 둠(2026-10-16). 사진 파일을 받아 `data/사진/` + `기관사진.csv`에 넣는다.
 - **자료 보완**: 한부모/다문화 탭(5곳) 보강. (민방위교육장 지하 1층은 군 관련 시설이라 좌표 없음이 맞다 — 지도에 안 나와도 정상)
