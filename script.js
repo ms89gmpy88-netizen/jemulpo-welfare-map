@@ -5,6 +5,22 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;",
 
 let map, clusterer, info, current = [], category = "전체";
 
+// 분야별 지도 표시 색. 메뉴 버튼의 색 점도 같은 색이라 메뉴가 곧 범례입니다.
+const colors = {
+  "어르신": "#e8590c", "장애인": "#7048e8", "여성/아동": "#f06595", "한부모/다문화": "#8c5a2b",
+  "복지관/자활": "#1c7ed6", "건강/재활": "#2f9e44", "대피소": "#c92a2a", "쉼터": "#0c8599",
+};
+const pins = {};
+const pinImage = color => pins[color] ||= new kakao.maps.MarkerImage(
+  "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38"><path d="M14 1C7 1 1.5 6.4 1.5 13.3 1.5 22.5 14 37 14 37s12.5-14.5 12.5-23.7C26.5 6.4 21 1 14 1z" fill="${color}" stroke="#fff" stroke-width="2"/><circle cx="14" cy="13.5" r="4.5" fill="#fff"/></svg>`),
+  new kakao.maps.Size(28, 38), { offset: new kakao.maps.Point(14, 37) });
+// 전체 탭에서는 기관의 첫 번째 분야 색, 분야 탭에서는 그 탭 색으로 칠합니다.
+const colorOf = f => colors[category === "전체" ? f.categories[0] : category];
+
+document.querySelectorAll(".menu button").forEach(b => {
+  if (colors[b.dataset.category]) b.style.setProperty("--dot", colors[b.dataset.category]);
+});
+
 // 띄어쓰기를 빼고 비교해서 '송림 동'처럼 입력해도 찾을 수 있게 합니다.
 const squash = s => String(s || "").replace(/\s/g, "").toLowerCase();
 
@@ -36,7 +52,7 @@ function drawMarkers() {
   info.close();
   clusterer.clear();
   clusterer.addMarkers(current.filter(f => f.lat).map(f => {
-    f.marker = new kakao.maps.Marker({ position: new kakao.maps.LatLng(f.lat, f.lng), title: f.name });
+    f.marker = new kakao.maps.Marker({ position: new kakao.maps.LatLng(f.lat, f.lng), title: f.name, image: pinImage(colorOf(f)) });
     kakao.maps.event.addListener(f.marker, "click", () => openInfo(f));
     return f.marker;
   }));

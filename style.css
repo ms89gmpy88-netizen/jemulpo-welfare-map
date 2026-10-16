@@ -47,6 +47,18 @@ body {
   cursor: pointer;
 }
 .menu button.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+/* 지도 표시 색과 같은 색 점 (script.js의 colors) */
+.menu button[style*="--dot"]::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--dot);
+  box-shadow: 0 0 0 2px #fff;
+  vertical-align: 0;
+}
 
 .layout {
   display: grid;
