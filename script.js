@@ -3,10 +3,16 @@
 if (location.hostname === "127.0.0.1") location.replace(location.href.replace("127.0.0.1", "localhost"));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
-let map, clusterer, info, current = [];
+let map, clusterer, info, current = [], category = "전체";
 
-function show(category) {
-  current = category === "전체" ? facilities : facilities.filter(f => f.categories.includes(category));
+// 띄어쓰기를 빼고 비교해서 '송림 동'처럼 입력해도 찾을 수 있게 합니다.
+const squash = s => String(s || "").replace(/\s/g, "").toLowerCase();
+
+function show() {
+  const q = squash(document.getElementById("search").value);
+  current = facilities.filter(f =>
+    (category === "전체" || f.categories.includes(category)) &&
+    (!q || squash(f.name + f.address + f.type).includes(q)));
   document.getElementById("count").textContent = current.length + "곳";
   document.getElementById("cards").innerHTML = current.length
     ? current.map((f, i) => `
@@ -19,7 +25,7 @@ function show(category) {
         ${f.hours ? `<p>운영: ${esc(f.hours)}</p>` : ""}
         ${f.lat ? '<button class="pin-btn" type="button">지도에서 보기</button>' : ""}`}
       </article>`).join("")
-    : "<p>이 분야의 기관 정보는 준비 중입니다.</p>";
+    : `<p>${document.getElementById("search").value.trim() ? "검색 결과가 없습니다. 다른 말로 찾아보세요." : "이 분야의 기관 정보는 준비 중입니다."}</p>`;
   drawMarkers();
 }
 
@@ -56,9 +62,12 @@ document.querySelectorAll(".menu button").forEach(button => {
   button.addEventListener("click", () => {
     document.querySelector(".menu .active").classList.remove("active");
     button.classList.add("active");
-    show(button.dataset.category);
+    category = button.dataset.category;
+    show();
   });
 });
+
+document.getElementById("search").addEventListener("input", show);
 
 // 카카오 지도는 인터넷 연결과 등록된 주소(실행.bat)가 있어야 열립니다. 없으면 목록만 보여 줍니다.
 if (window.kakao && kakao.maps) {
@@ -73,4 +82,4 @@ if (window.kakao && kakao.maps) {
   });
 }
 
-show("전체");
+show();
