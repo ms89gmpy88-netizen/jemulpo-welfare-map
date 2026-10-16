@@ -109,6 +109,8 @@ const noGuide = facilities.filter(f => !f.target).map(f => f.name + "(" + f.type
 if (noGuide.length) console.log("대상·하는 일 안내 없음: " + noGuide.join(", ") + " → 시설종류안내.js에 줄을 추가하세요");
 const ownMissing = Object.keys(own).filter(n => !facilities.some(f => f.name === n));
 if (ownMissing.length) console.log("기관별사업.csv에만 있고 목록에 없는 이름: " + ownMissing.join(", "));
-const noPin =facilities.filter(f => !f.private && f.lat === undefined).map(f => f.name);
+// 군 관련 시설이라 좌표를 찾을 수 없는 곳(목록에만 싣고 지도에는 안 나옴)
+const noPinOk = ["민방위교육장 지하 1층"];
+const noPin = facilities.filter(f => !f.private && f.lat === undefined && !noPinOk.includes(f.name)).map(f => f.name);
 if (noPin.length) console.log("좌표 없음(지도에 안 나옴): " + noPin.join(", ") + " → 주소가 바뀌었으면 coords.json도 새로 만들어야 합니다");
 console.log(facilities.length + "곳 저장",Object.fromEntries(tabs.map(t => [t, facilities.filter(f => f.categories.includes(t)).length])));
