@@ -99,6 +99,12 @@ for (const g of merged) {
   facilities.push(f);
 }
 
+// 운영 시간: 운영시간.csv(기관 홈페이지·구청·어린이집정보공개포털에서 확인한 것)가 쉼터 자료의 운영시간보다 먼저입니다.
+const hours = Object.fromEntries(parse("운영시간.csv").map(r => [r["시설명"], r["운영시간"]]));
+facilities.forEach(f => { if (hours[f.name]) f.hours = hours[f.name]; });
+const hoursMissing = Object.keys(hours).filter(n => !facilities.some(f => f.name === n));
+if (hoursMissing.length) console.log("운영시간.csv에만 있고 목록에 없는 이름: " + hoursMissing.join(", "));
+
 const tabs = ["어르신", "장애인", "여성/아동", "한부모/다문화", "복지관/자활", "건강/재활", "대피소", "쉼터"];
 console.assert(facilities.every(f => f.name && (f.address || f.private) && f.categories.every(c => tabs.includes(c))), "이름·주소가 비었거나 분야 이름이 틀린 기관이 있습니다");
 fs.writeFileSync(path.join(__dirname, "..", "facilities.js"),
