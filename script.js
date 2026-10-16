@@ -1,6 +1,18 @@
 // 기관 정보는 facilities.js 에 있습니다 (data 폴더의 CSV로 만듦).
 // 카카오에는 localhost만 등록되어 있어서, 127.0.0.1로 열리면 localhost로 바꿔 엽니다.
 if (location.hostname === "127.0.0.1") location.replace(location.href.replace("127.0.0.1", "localhost"));
+// 선 아이콘 (그림 글자 대신 같은 굵기의 선으로 그립니다)
+const icons = {
+  chevron: '<path d="m9 6 6 6-6 6"/>',
+  pin: '<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+  phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+  route: '<path d="m3 11 18-8-8 18-2-8-8-2z"/>',
+  share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>',
+  undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+  locate: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+  map: '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>',
+};
+const icon = name => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${icons[name]}</svg>`;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
 let map, clusterer, info, current = [], category = "전체", me = null, meMarker = null;
@@ -38,18 +50,18 @@ function show() {
   document.getElementById("count").textContent = current.length + "곳";
   document.getElementById("cards").innerHTML = current.length
     ? current.map((f, i) => `
-      <article class="card${f.lat ? " has-pin" : ""}" data-i="${i}">
-        ${f.categories.map(c => `<span class="tag">${esc(c)}</span>`).join("")}<span class="tag">${esc(f.type)}</span>${f.check ? '<span class="tag check">확인 필요</span>' : ""}
-        <h3><button class="name-btn" type="button" title="상세정보 보기">${esc(f.name)}</button>${me && f.dist < Infinity ? `<span class="dist">${distText(f.dist)}</span>` : ""}</h3>
+      <article class="card" data-i="${i}">
+        <p class="card-meta"><span class="dot" style="--dot:${colors[f.categories[0]]}"></span>${esc(f.categories.join(" · "))} · ${esc(f.type)}${f.check ? ' <span class="badge">확인 필요</span>' : ""}</p>
+        <h3><button class="name-btn" type="button" title="상세정보 보기">${esc(f.name)}${icon("chevron")}</button>${me && f.dist < Infinity ? `<span class="dist">${distText(f.dist)}</span>` : ""}</h3>
         ${f.target ? `<p class="who"><b>대상</b> ${esc(f.target)}</p>` : ""}
         ${f.service ? `<p class="who"><b>하는 일</b> ${esc(f.service)}</p>` : ""}
         ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소와 전화번호를 공개하지 않습니다.</p>" : `
-        <p>주소: ${esc(f.address)}</p>
-        <p>전화: ${f.phone ? `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>` : "정보 없음"}</p>
-        ${f.hours ? `<p>운영: ${esc(f.hours)}</p>` : ""}
-        ${f.lat ? '<button class="pin-btn" type="button">지도에서 보기</button>' : ""}`}
+        <p><span class="k">주소</span>${esc(f.address)}</p>
+        <p><span class="k">전화</span>${f.phone ? `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>` : "정보 없음"}</p>
+        ${f.hours ? `<p><span class="k">운영</span>${esc(f.hours)}</p>` : ""}
+        ${f.lat ? `<button class="pin-btn" type="button">${icon("pin")}지도에서 보기</button>` : ""}`}
       </article>`).join("")
-    : `<p>${document.getElementById("search").value.trim() ? "검색 결과가 없습니다. 다른 말로 찾아보세요." : "이 분야의 기관 정보는 준비 중입니다."}</p>`;
+    : `<p class="empty">${document.getElementById("search").value.trim() ? "검색 결과가 없습니다. 다른 말로 찾아보세요." : "이 분야의 기관 정보는 준비 중입니다."}</p>`;
   drawMarkers();
 }
 
@@ -93,7 +105,13 @@ function openDetail(f) {
   document.getElementById("detail-body").innerHTML = `
     <p class="tags">${f.categories.map(c => `<span class="tag">${esc(c)}</span>`).join("")}</p>
     <h2 id="detail-name">${esc(f.name)}</h2>
-    ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소·전화를 공개하지 않습니다.</p>" : ""}
+    ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소·전화를 공개하지 않습니다.</p>" : `
+    <div class="quick">
+      ${f.phone ? `<a class="main" href="tel:${esc(f.phone)}">${icon("phone")}전화</a>` : ""}
+      ${f.lat ? `<a${f.phone ? "" : ' class="main"'} href="https://map.kakao.com/link/to/${encodeURIComponent(f.name)},${f.lat},${f.lng}" target="_blank" rel="noopener">${icon("route")}길찾기</a>` : ""}
+      <button type="button" id="detail-share">${icon("share")}공유</button>
+    </div>
+    <p class="share-msg" id="share-msg" role="status" hidden></p>`}
     ${f.target || f.service ? `<div class="summary">
       ${f.target ? `<p><b>대상</b>${esc(f.target)}</p>` : ""}
       ${f.service ? `<p><b>하는 일</b></p><ul>${f.service.split(/,\s*(?![^()]*\))/).map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
@@ -118,13 +136,27 @@ function openDetail(f) {
     <ul class="way-list"><li>${esc(f.address)}</li><li id="way-subway">가까운 지하철역 찾는 중…</li></ul>
     <p class="note">지하철역 거리는 직선거리라 실제로 걷는 길은 더 멀 수 있습니다. 버스 노선은 카카오맵 길찾기에서 확인하세요.</p>
     <p class="actions">
-      <button class="pin-btn" type="button" id="detail-map">지도에서 보기</button>
-      <a class="pin-btn" href="https://map.kakao.com/link/to/${encodeURIComponent(f.name)},${f.lat},${f.lng}" target="_blank" rel="noopener">길찾기 (카카오맵)</a>
+      <button class="pin-btn" type="button" id="detail-map">${icon("pin")}지도에서 보기</button>
     </p>` : ""}`;
   if (!dialog.open) dialog.showModal();
   dialog.scrollTop = 0;
   document.getElementById("detail-map")?.addEventListener("click", () => { dialog.close(); if (map) focusOnMap(f); });
+  document.getElementById("detail-share")?.addEventListener("click", () => share(f));
   if (f.lat) showWay(f);
+}
+
+// 공유: 휴대폰은 공유 창(카카오톡 등), 컴퓨터는 링크 복사. 링크를 열면 이 기관 창이 바로 열립니다.
+async function share(f) {
+  const msg = document.getElementById("share-msg");
+  const url = location.origin + location.pathname + "#" + encodeURIComponent(f.name);
+  const text = [f.name, f.address, f.phone && "전화 " + f.phone].filter(Boolean).join("\n");
+  const tell = t => { msg.textContent = t; msg.hidden = false; };
+  try {
+    if (navigator.share) await navigator.share({ title: f.name, text, url });
+    else { await navigator.clipboard.writeText(text + "\n" + url); tell("기관 정보와 링크를 복사했습니다. 카카오톡이나 문자에 붙여넣기 하세요."); }
+  } catch (e) {
+    if (e.name !== "AbortError") tell("공유하지 못했습니다. 주소창의 링크를 직접 복사해 주세요.");
+  }
 }
 
 // 오시는 길: 작은 지도와 가까운 지하철역(카카오 장소 검색, 1.5km 안 2곳)
@@ -168,7 +200,7 @@ nearBtn.addEventListener("click", () => {
   if (me) { // 다시 누르면 원래 순서로
     me = null;
     meMarker?.setMap(null);
-    nearBtn.textContent = "📍 내 주변 가까운 순";
+    nearBtn.innerHTML = icon("locate") + "<span>내 주변 가까운 순</span>";
     nearBtn.setAttribute("aria-pressed", "false");
     say("");
     return show();
@@ -177,7 +209,7 @@ nearBtn.addEventListener("click", () => {
   say("내 위치를 찾는 중입니다… 위치 사용을 묻는 창이 뜨면 '허용'을 눌러 주세요.");
   navigator.geolocation.getCurrentPosition(p => {
     me = { lat: p.coords.latitude, lng: p.coords.longitude };
-    nearBtn.textContent = "↩ 원래 순서로";
+    nearBtn.innerHTML = icon("undo") + "<span>원래 순서로</span>";
     nearBtn.setAttribute("aria-pressed", "true");
     const far = facilities.every(f => !f.lat || km(me, f) > 10);
     say(far ? "지금 위치가 제물포구에서 10km 넘게 떨어져 있어요. 가까운 순 정렬은 제물포구 안에서 쓰면 정확합니다." : "내 위치에서 가까운 순으로 보여 드립니다. 컴퓨터는 위치가 정확하지 않을 수 있습니다.");
@@ -196,7 +228,7 @@ nearBtn.addEventListener("click", () => {
 const mapToggle = document.getElementById("map-toggle");
 mapToggle.addEventListener("click", () => {
   const folded = document.body.classList.toggle("map-folded");
-  mapToggle.textContent = folded ? "🗺️ 지도 펴기" : "🗺️ 지도 접기";
+  mapToggle.querySelector("span").textContent = folded ? "지도 펴기" : "지도 접기";
   mapToggle.setAttribute("aria-pressed", String(folded));
   if (!folded && map) setTimeout(() => map.relayout(), 0); // 다시 보일 때 지도 크기 맞추기
 });
@@ -228,3 +260,9 @@ if (window.kakao && kakao.maps) {
 }
 
 show();
+
+// 공유받은 링크(#기관이름)로 들어오면 그 기관 창을 바로 엽니다.
+try {
+  const linked = location.hash && facilities.find(f => f.name === decodeURIComponent(location.hash.slice(1)));
+  if (linked) openDetail(linked);
+} catch (e) {}

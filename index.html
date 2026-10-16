@@ -4,13 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>제물포 복지지도</title>
+  <meta name="theme-color" content="#f6f4ef">
+  <!-- 글꼴: Pretendard (읽기 쉬운 한글 글꼴, 무료) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="top">
-    <button id="big-text" class="big-btn" type="button" aria-pressed="false">가 글씨 크게</button>
-    <h1>제물포 복지지도</h1>
-    <p>복지시설·대피소·쉼터, 우리 동네에서 한눈에 찾기</p>
+    <div class="top-in">
+      <div>
+        <h1>제물포 복지지도</h1>
+        <p>복지시설·대피소·쉼터, 우리 동네에서 한눈에 찾기</p>
+      </div>
+      <button id="big-text" class="big-btn" type="button" aria-pressed="false">가 글씨 크게</button>
+    </div>
   </header>
 
   <nav class="menu" aria-label="복지 분야">
@@ -27,14 +34,20 @@
 
   <main class="layout">
     <section class="list">
-      <input id="search" class="search" type="search" placeholder="이름·동·대상·하는 일 (예: 치매)" aria-label="기관 검색">
+      <div class="search-box">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="search" class="search" type="search" placeholder="이름·동·대상·하는 일 (예: 치매)" aria-label="기관 검색">
+      </div>
       <div class="tools">
-        <button id="near" class="tool-btn" type="button" aria-pressed="false">📍 내 주변 가까운 순</button>
-        <button id="map-toggle" class="tool-btn" type="button" aria-pressed="false">🗺️ 지도 접기</button>
+        <button id="near" class="tool-btn" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span>내 주변 가까운 순</span></button>
+        <button id="map-toggle" class="tool-btn" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg><span>지도 접기</span></button>
       </div>
       <p id="near-msg" class="near-msg" hidden></p>
       <h2>기관 목록 <span id="count"></span></h2>
-      <p class="notice">출처: 공공데이터포털 제물포구 자료, 제물포구청·보건소 홈페이지, 인천시 자료, 국민안전24(대피소·쉼터), 각 기관 홈페이지 (2026년 10월 확인). '대상'과 '하는 일'은 시설 종류에 따른 일반 안내에 구청에서 확인한 기관별 사업을 더한 것이라 기관마다 다를 수 있습니다. 방문 전 전화로 확인하세요.</p>
+      <details class="notice">
+        <summary>자료 출처와 이용 안내</summary>
+        <p>출처: 공공데이터포털 제물포구 자료, 제물포구청·보건소 홈페이지, 인천시 자료, 국민안전24(대피소·쉼터), 각 기관 홈페이지 (2026년 10월 확인). '대상'과 '하는 일'은 시설 종류에 따른 일반 안내에 구청에서 확인한 기관별 사업을 더한 것이라 기관마다 다를 수 있습니다. 방문 전 전화로 확인하세요.</p>
+      </details>
       <div id="cards"></div>
     </section>
 
@@ -45,7 +58,7 @@
 
   <!-- 기관 이름을 누르면 열리는 상세정보 창 (script.js의 openDetail) -->
   <dialog id="detail" class="detail" aria-labelledby="detail-name">
-    <button class="close" type="button" aria-label="닫기">✕</button>
+    <button class="close" type="button" aria-label="닫기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
     <div id="detail-body"></div>
   </dialog>
 

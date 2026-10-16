@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "jemulpo-map",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "http-server", "-p", "8765", "-a", "localhost", "-c-1"],
+      "port": 8765,
+      "url": "http://localhost:8765"
+    }
+  ]
+}
