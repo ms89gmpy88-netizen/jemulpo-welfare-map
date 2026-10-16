@@ -192,6 +192,10 @@ a.pin-btn { display: inline-block; text-decoration: none; }
 .detail .how { margin: 0 0 8px; line-height: 1.6; background: var(--mint-light); padding: 10px 12px; border-radius: 10px; }
 .way-map { width: 100%; height: 180px; border-radius: 12px; overflow: hidden; margin-bottom: 8px; }
 .way-list { margin: 0; padding-left: 20px; line-height: 1.7; font-size: 15px; }
+.summary { background: #eef4ff; border-left: 4px solid var(--blue); border-radius: 10px; padding: 10px 14px; margin-bottom: 4px; font-size: 16px; line-height: 1.6; }
+.summary p { margin: 0 0 4px; }
+.summary b { color: var(--blue-dark); margin-right: 8px; }
+.summary ul { margin: 0; padding-left: 20px; }
 
 /* 맨 위 '글씨 크게' 버튼 */
 .top { position: relative; }
@@ -242,5 +246,5 @@ html.big .top h1 { font-size: 34px; }
 html.big .top p { font-size: 19px; }
 html.big .detail h2 { font-size: 27px; }
 html.big .detail h3 { font-size: 20px; }
-html.big .info-table, html.big .detail .how, html.big .way-list, html.big .detail .note { font-size: 19px; }
+html.big .info-table, html.big .detail .how, html.big .way-list, html.big .summary, html.big .detail .note { font-size: 19px; }
 html.big .dist { font-size: 18px; }

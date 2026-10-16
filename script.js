@@ -94,6 +94,10 @@ function openDetail(f) {
     <p class="tags">${f.categories.map(c => `<span class="tag">${esc(c)}</span>`).join("")}</p>
     <h2 id="detail-name">${esc(f.name)}</h2>
     ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소·전화를 공개하지 않습니다.</p>" : ""}
+    ${f.target || f.service ? `<div class="summary">
+      ${f.target ? `<p><b>대상</b>${esc(f.target)}</p>` : ""}
+      ${f.service ? `<p><b>하는 일</b></p><ul>${f.service.split(/,\s*(?![^()]*\))/).map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
+    </div>` : ""}
     ${f.how ? `<h3>이용 방법</h3><p class="how">${esc(f.how)}</p>` : ""}
     <table class="info-table">
       ${f.private ? "" : row("주소", esc(f.address))}
@@ -102,8 +106,6 @@ function openDetail(f) {
       ${shelter ? "" : row("운영주체 구분", esc(f.operatorType || ""))}
       ${row("시설 종류", esc(f.type))}
       ${shelter ? "" : row("법인명", esc(f.corp || ""))}
-      ${f.target ? row("대상", esc(f.target)) : ""}
-      ${f.service ? row("하는 일", esc(f.service)) : ""}
       ${f.hours ? row("운영", esc(f.hours)) : ""}
     </table>
     ${f.private ? "" : `<h3>이용 편의</h3>
