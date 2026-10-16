@@ -97,14 +97,25 @@ document.getElementById("cards").addEventListener("click", e => {
   else if (e.target.closest(".pin-btn") && map) focusOnMap(f);
 });
 
-// 운영 시간 읽기 쉽게: "월,화,수,목,금 / 평일 09:00~18:00" → "월~금 · 평일 09:00~18:00"
+// 운영 시간 읽기 쉽게 두 부분으로 나눕니다.
+// "월,화,수,목,금 / 09:00~18:00 / 점심 12:00~13:00 / 공휴일 휴무"
+//   → 기본: "월~금 09:00 ~ 18:00", 덧붙임: "점심 12:00 ~ 13:00, 공휴일 휴무"
 const week = "월화수목금토일";
-const hoursText = h => h.split(" / ").map(part => {
-  if (!/^[월화수목금토일](,[월화수목금토일])*$/.test(part)) return part;
+const dayRange = part => {
+  if (!/^[월화수목금토일](,[월화수목금토일])*$/.test(part)) return null;
   const idx = part.split(",").map(d => week.indexOf(d)), runs = [];
   idx.forEach(i => (runs.length && i === runs.at(-1).at(-1) + 1 ? runs.at(-1).push(i) : runs.push([i])));
   return runs.map(r => r.length > 2 ? week[r[0]] + "~" + week[r.at(-1)] : r.map(i => week[i]).join(", ")).join(", ");
-}).join(" · ");
+};
+const spaced = s => s.replace(/(\d{1,2}:\d{2})\s*~\s*(\d{1,2}:\d{2})/g, "$1 ~ $2");
+const hoursParts = h => {
+  const parts = h.split(" / ").map(s => s.trim()), main = [];
+  const days = dayRange(parts[0]);
+  if (days) { main.push(days); parts.shift(); }
+  if (parts.length) main.push(days ? parts.shift().replace(/^평일\s+/, "") : parts.shift());
+  return { main: spaced(main.join(" ")), extra: parts.map(spaced).join(", ") };
+};
+const hoursText = h => { const { main, extra } = hoursParts(h); return main + (extra ? ` (${extra})` : ""); };
 
 const dialog = document.getElementById("detail");
 const row = (label, value) => `<tr><th>${label}</th><td>${value || '<span class="none">정보 없음</span>'}</td></tr>`;
@@ -124,7 +135,7 @@ function openDetail(f) {
     <div class="summary">
       ${f.target ? `<p><b>대상</b>${esc(f.target)}</p>` : ""}
       ${f.service ? `<p><b>하는 일</b></p><ul>${f.service.split(/,\s*(?![^()]*\))/).map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
-      <p class="hours"><b>운영 시간</b>${f.hours ? esc(hoursText(f.hours)) : '<span class="none">아직 확인하지 못했습니다. 방문 전에 전화로 확인하세요.</span>'}</p>
+      <p class="hours"><b>운영 시간</b><span>${f.hours ? (({ main, extra }) => esc(main) + (extra ? `<span class="sub">(${esc(extra)})</span>` : ""))(hoursParts(f.hours)) : '<span class="none">아직 확인하지 못했습니다. 방문 전에 전화로 확인하세요.</span>'}</span></p>
     </div>
     ${f.how ? `<h3>이용 방법</h3><p class="how">${esc(f.how)}</p>` : ""}
     <table class="info-table">
