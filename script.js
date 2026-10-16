@@ -58,7 +58,7 @@ function show() {
         ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소와 전화번호를 공개하지 않습니다.</p>" : `
         <p><span class="k">주소</span>${esc(f.address)}</p>
         <p><span class="k">전화</span>${f.phone ? `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>` : "정보 없음"}</p>
-        ${f.hours ? `<p><span class="k">운영</span>${esc(f.hours)}</p>` : ""}
+        ${f.hours ? `<p><span class="k">운영</span>${esc(hoursText(f.hours))}</p>` : ""}
         ${f.lat ? `<button class="pin-btn" type="button">${icon("pin")}지도에서 보기</button>` : ""}`}
       </article>`).join("")
     : `<p class="empty">${document.getElementById("search").value.trim() ? "검색 결과가 없습니다. 다른 말로 찾아보세요." : "이 분야의 기관 정보는 준비 중입니다."}</p>`;
@@ -97,6 +97,15 @@ document.getElementById("cards").addEventListener("click", e => {
   else if (e.target.closest(".pin-btn") && map) focusOnMap(f);
 });
 
+// 운영 시간 읽기 쉽게: "월,화,수,목,금 / 평일 09:00~18:00" → "월~금 · 평일 09:00~18:00"
+const week = "월화수목금토일";
+const hoursText = h => h.split(" / ").map(part => {
+  if (!/^[월화수목금토일](,[월화수목금토일])*$/.test(part)) return part;
+  const idx = part.split(",").map(d => week.indexOf(d)), runs = [];
+  idx.forEach(i => (runs.length && i === runs.at(-1).at(-1) + 1 ? runs.at(-1).push(i) : runs.push([i])));
+  return runs.map(r => r.length > 2 ? week[r[0]] + "~" + week[r.at(-1)] : r.map(i => week[i]).join(", ")).join(", ");
+}).join(" · ");
+
 const dialog = document.getElementById("detail");
 const row = (label, value) => `<tr><th>${label}</th><td>${value || '<span class="none">정보 없음</span>'}</td></tr>`;
 
@@ -112,10 +121,11 @@ function openDetail(f) {
       <button type="button" id="detail-share">${icon("share")}공유</button>
     </div>
     <p class="share-msg" id="share-msg" role="status" hidden></p>`}
-    ${f.target || f.service ? `<div class="summary">
+    <div class="summary">
       ${f.target ? `<p><b>대상</b>${esc(f.target)}</p>` : ""}
       ${f.service ? `<p><b>하는 일</b></p><ul>${f.service.split(/,\s*(?![^()]*\))/).map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
-    </div>` : ""}
+      <p class="hours"><b>운영 시간</b>${f.hours ? esc(hoursText(f.hours)) : '<span class="none">아직 확인하지 못했습니다. 방문 전에 전화로 확인하세요.</span>'}</p>
+    </div>
     ${f.how ? `<h3>이용 방법</h3><p class="how">${esc(f.how)}</p>` : ""}
     <table class="info-table">
       ${f.private ? "" : row("주소", esc(f.address))}
@@ -124,7 +134,6 @@ function openDetail(f) {
       ${shelter ? "" : row("운영주체 구분", esc(f.operatorType || ""))}
       ${row("시설 종류", esc(f.type))}
       ${shelter ? "" : row("법인명", esc(f.corp || ""))}
-      ${f.hours ? row("운영", esc(f.hours)) : ""}
     </table>
     ${f.private ? "" : `<h3>이용 편의</h3>
     <table class="info-table">

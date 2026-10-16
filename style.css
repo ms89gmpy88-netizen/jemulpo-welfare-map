@@ -336,6 +336,8 @@ button { font: inherit; color: inherit; }
 .summary b { color: var(--accent-strong); margin-right: 0.5rem; }
 .summary ul { margin: 0; padding-left: 1.2rem; }
 .summary li::marker { color: var(--accent); }
+.summary .hours { margin: 0.6rem 0 0; padding-top: 0.6rem; border-top: 1px solid var(--line); }
+.summary .none { color: var(--muted); }
 .detail .how { margin: 0; line-height: 1.65; border: 1px solid var(--line); padding: 0.75rem 0.95rem; border-radius: var(--radius); }
 
 .info-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
