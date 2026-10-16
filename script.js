@@ -93,11 +93,7 @@ function openDetail(f) {
   document.getElementById("detail-body").innerHTML = `
     <p class="tags">${f.categories.map(c => `<span class="tag">${esc(c)}</span>`).join("")}</p>
     <h2 id="detail-name">${esc(f.name)}</h2>
-    ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소·전화·사진을 공개하지 않습니다.</p>" : shelter ? "" : `
-    <h3>사진</h3>
-    ${f.photos ? `<div class="photos">${f.photos.map(p => `<figure><img src="${esc(p.src)}" alt="${esc(f.name + " " + (p.caption || "사진"))}" loading="lazy"><figcaption>${esc(p.caption || "")} <small>출처: ${esc(p.credit)}</small></figcaption></figure>`).join("")}</div>`
-      : `<div class="no-photo"><p>아직 기관이 사용을 허락한 사진이 없습니다.</p>
-        ${f.homepage ? `<a class="pin-btn" href="${esc(f.homepage)}" target="_blank" rel="noopener">기관 홈페이지에서 사진 보기</a>` : "<p>기관에 전화로 문의해 보세요.</p>"}</div>`}`}
+    ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소·전화를 공개하지 않습니다.</p>" : ""}
     ${f.how ? `<h3>이용 방법</h3><p class="how">${esc(f.how)}</p>` : ""}
     <table class="info-table">
       ${f.private ? "" : row("주소", esc(f.address))}
@@ -115,13 +111,35 @@ function openDetail(f) {
       ${["휠체어 출입", "엘리베이터", "주차", "장애인 화장실"].map(k => row(k, esc(f.access?.[k] || ""))).join("")}
     </table>
     <p class="note">${f.access?.["출처"] ? "출처: " + esc(f.access["출처"]) + "<br>기관이 들어 있는 건물 기준이며, '자료에 없음'은 설치되지 않았다는 뜻이 아닐 수 있습니다. 방문 전에 전화로 확인하세요." : "아직 확인된 이용 편의 정보가 없습니다. 방문 전에 전화로 확인하세요."}</p>`}
-    ${f.lat ? `<p class="actions">
+    ${f.lat ? `<h3>오시는 길</h3>
+    <div class="way-map" id="way-map"></div>
+    <ul class="way-list"><li>${esc(f.address)}</li><li id="way-subway">가까운 지하철역 찾는 중…</li></ul>
+    <p class="note">지하철역 거리는 직선거리라 실제로 걷는 길은 더 멀 수 있습니다. 버스 노선은 카카오맵 길찾기에서 확인하세요.</p>
+    <p class="actions">
       <button class="pin-btn" type="button" id="detail-map">지도에서 보기</button>
       <a class="pin-btn" href="https://map.kakao.com/link/to/${encodeURIComponent(f.name)},${f.lat},${f.lng}" target="_blank" rel="noopener">길찾기 (카카오맵)</a>
     </p>` : ""}`;
   if (!dialog.open) dialog.showModal();
   dialog.scrollTop = 0;
   document.getElementById("detail-map")?.addEventListener("click", () => { dialog.close(); if (map) focusOnMap(f); });
+  if (f.lat) showWay(f);
+}
+
+// 오시는 길: 작은 지도와 가까운 지하철역(카카오 장소 검색, 1.5km 안 2곳)
+function showWay(f) {
+  const subway = document.getElementById("way-subway");
+  if (!map) { subway.remove(); return; }
+  const pos = new kakao.maps.LatLng(f.lat, f.lng);
+  new kakao.maps.StaticMap(document.getElementById("way-map"), { center: pos, level: 3, marker: { position: pos } });
+  new kakao.maps.services.Places().categorySearch("SW8", (list, status) => {
+    if (!subway.isConnected) return; // 그사이 다른 기관 창을 열었으면 그만둡니다
+    if (status === kakao.maps.services.Status.ZERO_RESULT) { subway.textContent = "걸어갈 만한 거리(1.5km)에 지하철역이 없습니다."; return; }
+    if (status !== kakao.maps.services.Status.OK) { subway.remove(); return; }
+    subway.textContent = "가까운 지하철역: " + list.slice(0, 2).map(s => {
+      const m = Number(s.distance);
+      return `${s.place_name} (약 ${m >= 1000 ? (m / 1000).toFixed(1) + "km" : Math.round(m / 10) * 10 + "m"}, 걸어서 약 ${Math.max(1, Math.round(m / 67))}분)`;
+    }).join(", ");
+  }, { location: pos, radius: 1500, sort: kakao.maps.services.SortBy.DISTANCE });
 }
 
 dialog.querySelector(".close").addEventListener("click", () => dialog.close());
