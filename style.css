@@ -100,6 +100,8 @@ body {
 }
 .tag.check { background: #fff3cd; color: #8a6100; }
 .card a { color: var(--blue); }
+.card p.who { color: var(--text); }
+.card p.who b { color: var(--blue-dark); margin-right: 4px; }
 
 .map {
   min-height: 320px;

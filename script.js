@@ -12,13 +12,15 @@ function show() {
   const q = squash(document.getElementById("search").value);
   current = facilities.filter(f =>
     (category === "전체" || f.categories.includes(category)) &&
-    (!q || squash(f.name + f.address + f.type).includes(q)));
+    (!q || squash(f.name + f.address + f.type + f.target + f.service).includes(q)));
   document.getElementById("count").textContent = current.length + "곳";
   document.getElementById("cards").innerHTML = current.length
     ? current.map((f, i) => `
       <article class="card${f.lat ? " has-pin" : ""}" data-i="${i}">
         ${f.categories.map(c => `<span class="tag">${esc(c)}</span>`).join("")}<span class="tag">${esc(f.type)}</span>${f.check ? '<span class="tag check">확인 필요</span>' : ""}
         <h3>${esc(f.name)}</h3>
+        ${f.target ? `<p class="who"><b>대상</b> ${esc(f.target)}</p>` : ""}
+        ${f.service ? `<p class="who"><b>하는 일</b> ${esc(f.service)}</p>` : ""}
         ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소와 전화번호를 공개하지 않습니다.</p>" : `
         <p>주소: ${esc(f.address)}</p>
         <p>전화: ${f.phone ? `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>` : "정보 없음"}</p>

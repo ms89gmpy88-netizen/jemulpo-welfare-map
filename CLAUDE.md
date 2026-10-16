@@ -13,7 +13,9 @@
 | `facilities.js` | **자동 생성 파일. 직접 고치지 않는다.** `node data/make-data.js` 로 만든다 |
 | `data/*.csv` | 기관 원자료 (실제로 고치는 곳) |
 | `data/coords.json` | 주소 → [위도, 경도]. 카카오 주소 검색으로 만든 것 |
-| `data/make-data.js` | CSV + coords.json → facilities.js |
+| `data/make-data.js` | CSV + coords.json + 아래 두 파일 → facilities.js |
+| `data/시설종류안내.js` | 시설 종류별 '대상'·'하는 일' 일반 안내 (관련 법 정의·구청 안내 기준). 대피소·쉼터는 종류로만 맞춘다 |
+| `data/기관별사업.csv` | 기관별로 확인한 사업 (구청 급여종류, 경로식당, 식사배달, 노인맞춤돌봄 등). 재가·장기요양기관은 이것만 쓰고 일반 안내를 붙이지 않는다 |
 | `data/조사결과.md` | 자료 출처, 확인 과정, 바꾼 내용 기록. 자료를 바꾸면 여기에도 적는다 |
 | `실행.bat` | 내 컴퓨터에서 여는 파일. **CP949 + CRLF로 저장해야 한다** (UTF-8/LF면 더블클릭 시 실행 안 됨) |
 
