@@ -11,6 +11,9 @@ const facilities = [
   "phone": "032-761-3677",
   "target": "60세 이상 어르신",
   "service": "경로식당(무료 점심), 거동불편 어르신 식사배달, 노인맞춤돌봄서비스(안전·생활 지원), 여가·교육 프로그램, 건강관리, 상담, 사례관리",
+  "homepage": "https://jemulposwc.or.kr/",
+  "operatorType": "법인",
+  "corp": "사회적협동조합 디딤",
   "lat": 37.478366,
   "lng": 126.644483
  },
@@ -25,6 +28,8 @@ const facilities = [
   "phone": "032-765-3667",
   "target": "60세 이상 어르신",
   "service": "여가·교육 프로그램, 건강관리, 상담, 사례관리",
+  "operatorType": "법인",
+  "corp": "사단법인 나눔과 섬김",
   "lat": 37.476874,
   "lng": 126.63491
  },
@@ -39,6 +44,8 @@ const facilities = [
   "phone": "032-710-2771",
   "target": "60세 이상 어르신",
   "service": "여가·교육 프로그램, 건강관리, 상담, 사례관리",
+  "operatorType": "법인",
+  "corp": "사단법인 더함께새희망",
   "lat": 37.467803,
   "lng": 126.633882
  },
@@ -52,6 +59,8 @@ const facilities = [
   "phone": "032-772-1664",
   "target": "장기요양 등급을 받은 어르신",
   "service": "재가노인지원서비스, 방문요양, 방문목욕, 경로식당(무료 점심), 거동불편 어르신 식사배달, 노인맞춤돌봄서비스(안전·생활 지원)",
+  "operatorType": "법인",
+  "corp": "재단법인거룩한말씀의 수녀회",
   "lat": 37.478967,
   "lng": 126.630211
  },
@@ -65,6 +74,8 @@ const facilities = [
   "phone": "032-764-5221",
   "target": "장기요양 등급을 받은 어르신",
   "service": "재가노인 지원서비스",
+  "operatorType": "법인",
+  "corp": "오선복지재단",
   "lat": 37.468611,
   "lng": 126.625336
  },
@@ -78,6 +89,7 @@ const facilities = [
   "phone": "032-777-6670",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.474978,
   "lng": 126.61675
  },
@@ -91,6 +103,7 @@ const facilities = [
   "phone": "032-777-8842",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.479277,
   "lng": 126.620365
  },
@@ -104,6 +117,7 @@ const facilities = [
   "phone": "032-772-5022",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양 방문목욕",
+  "operatorType": "개인",
   "lat": 37.478611,
   "lng": 126.629901
  },
@@ -117,6 +131,8 @@ const facilities = [
   "phone": "032-236-1011",
   "target": "장기요양 등급을 받은 어르신",
   "service": "주야간보호",
+  "operatorType": "법인",
+  "corp": "사회복지법인 정도원",
   "lat": 37.453453,
   "lng": 126.600392
  },
@@ -130,6 +146,7 @@ const facilities = [
   "phone": "032-764-7855",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.47983,
   "lng": 126.624448
  },
@@ -143,6 +160,7 @@ const facilities = [
   "phone": "032-762-2341",
   "target": "장기요양 등급을 받은 어르신",
   "service": "주야간보호, 방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.47457,
   "lng": 126.630127
  },
@@ -156,6 +174,7 @@ const facilities = [
   "phone": "032-765-8866",
   "target": "장기요양 등급을 받은 어르신",
   "service": "주야간보호",
+  "operatorType": "개인",
   "lat": 37.478545,
   "lng": 126.632574
  },
@@ -169,6 +188,7 @@ const facilities = [
   "phone": "032-777-6664",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.473113,
   "lng": 126.620862
  },
@@ -182,6 +202,7 @@ const facilities = [
   "phone": "032-762-5050",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양 방문목욕",
+  "operatorType": "개인",
   "lat": 37.476073,
   "lng": 126.643225
  },
@@ -195,6 +216,7 @@ const facilities = [
   "phone": "032-721-9860",
   "target": "장기요양 등급을 받은 어르신",
   "service": "집으로 찾아가는 방문요양·방문목욕, 낮 시간 돌봄(주야간보호)",
+  "operatorType": "개인",
   "lat": 37.469166,
   "lng": 126.639849
  },
@@ -208,6 +230,7 @@ const facilities = [
   "phone": "032-777-7411",
   "target": "장기요양 등급을 받은 어르신",
   "service": "주야간보호",
+  "operatorType": "개인",
   "lat": 37.473367,
   "lng": 126.63185
  },
@@ -221,6 +244,7 @@ const facilities = [
   "phone": "032-772-0733",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양 방문목욕",
+  "operatorType": "개인",
   "lat": 37.473219,
   "lng": 126.637837
  },
@@ -234,6 +258,7 @@ const facilities = [
   "phone": "032-772-9998",
   "target": "장기요양 등급을 받은 어르신",
   "service": "주야간보호 방문요양",
+  "operatorType": "개인",
   "lat": 37.473632,
   "lng": 126.639654
  },
@@ -247,6 +272,7 @@ const facilities = [
   "phone": "032-574-9998",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양 방문목욕",
+  "operatorType": "개인",
   "lat": 37.473219,
   "lng": 126.637837
  },
@@ -260,6 +286,7 @@ const facilities = [
   "phone": "",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양 방문목욕",
+  "operatorType": "개인",
   "lat": 37.471827,
   "lng": 126.649639
  },
@@ -273,6 +300,7 @@ const facilities = [
   "phone": "032-213-2553",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.466441,
   "lng": 126.632999
  },
@@ -286,6 +314,7 @@ const facilities = [
   "phone": "032-777-7571",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양 방문목욕",
+  "operatorType": "개인",
   "lat": 37.484876,
   "lng": 126.6288
  },
@@ -299,6 +328,7 @@ const facilities = [
   "phone": "032-716-9336",
   "target": "장기요양 등급을 받은 어르신",
   "service": "주야간보호, 방문요양",
+  "operatorType": "개인",
   "lat": 37.471767,
   "lng": 126.630381
  },
@@ -313,6 +343,8 @@ const facilities = [
   "phone": "032-575-0019",
   "target": "치매 진단을 받은 장기요양 등급 어르신",
   "service": "주야간보호",
+  "homepage": "https://www.jemulpo.go.kr/clinic/health/dementia_daycare.jsp",
+  "operatorType": "법인",
   "lat": 37.479897,
   "lng": 126.666565
  },
@@ -327,6 +359,9 @@ const facilities = [
   "phone": "032-765-3545",
   "target": "치매 진단을 받은 장기요양 등급 어르신",
   "service": "주야간보호",
+  "homepage": "https://www.jemulpo.go.kr/clinic/health/dementia_daycare.jsp",
+  "operatorType": "법인",
+  "corp": "인하대학교 산학협력단",
   "lat": 37.477205,
   "lng": 126.62911
  },
@@ -340,6 +375,7 @@ const facilities = [
   "phone": "032-762-1007",
   "target": "장기요양 등급을 받은 어르신",
   "service": "주야간보호, 방문요양",
+  "operatorType": "개인",
   "lat": 37.473219,
   "lng": 126.637837
  },
@@ -353,6 +389,7 @@ const facilities = [
   "phone": "032-214-6054",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.469178,
   "lng": 126.638204
  },
@@ -366,6 +403,7 @@ const facilities = [
   "phone": "032-763-3359",
   "target": "장기요양 등급을 받은 어르신",
   "service": "집으로 찾아가는 방문요양·방문목욕, 낮 시간 돌봄(주야간보호)",
+  "operatorType": "개인",
   "lat": 37.478076,
   "lng": 126.628128
  },
@@ -379,6 +417,7 @@ const facilities = [
   "phone": "032-763-0777",
   "target": "장기요양 등급을 받은 어르신",
   "service": "주야간보호",
+  "operatorType": "개인",
   "lat": 37.475036,
   "lng": 126.626963
  },
@@ -392,6 +431,7 @@ const facilities = [
   "phone": "032-772-8988",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.480832,
   "lng": 126.635071
  },
@@ -405,6 +445,7 @@ const facilities = [
   "phone": "032-777-3897",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양 방문목욕",
+  "operatorType": "개인",
   "lat": 37.480325,
   "lng": 126.6277
  },
@@ -418,6 +459,7 @@ const facilities = [
   "phone": "032-765-7703",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.470946,
   "lng": 126.626336
  },
@@ -431,6 +473,7 @@ const facilities = [
   "phone": "032-773-1588",
   "target": "장기요양 등급을 받은 어르신",
   "service": "복지용구",
+  "operatorType": "개인",
   "lat": 37.470946,
   "lng": 126.626336
  },
@@ -444,6 +487,7 @@ const facilities = [
   "phone": "032-762-7625",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.473697,
   "lng": 126.644388
  },
@@ -457,6 +501,7 @@ const facilities = [
   "phone": "032-777-9011",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.469844,
   "lng": 126.635388
  },
@@ -470,6 +515,7 @@ const facilities = [
   "phone": "032-891-3006",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.464804,
   "lng": 126.631626
  },
@@ -483,6 +529,7 @@ const facilities = [
   "phone": "032-765-8860",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양 방문목욕",
+  "operatorType": "개인",
   "lat": 37.476754,
   "lng": 126.64431
  },
@@ -496,6 +543,7 @@ const facilities = [
   "phone": "032-772-2937",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양 방문목욕",
+  "operatorType": "개인",
   "lat": 37.483432,
   "lng": 126.626281
  },
@@ -509,6 +557,7 @@ const facilities = [
   "phone": "032-772-1955",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕, 복지용구",
+  "operatorType": "개인",
   "lat": 37.479754,
   "lng": 126.62541
  },
@@ -522,6 +571,7 @@ const facilities = [
   "phone": "032-765-5920",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.466282,
   "lng": 126.63656
  },
@@ -535,6 +585,7 @@ const facilities = [
   "phone": "032-766-5039",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.472145,
   "lng": 126.635234
  },
@@ -548,6 +599,7 @@ const facilities = [
   "phone": "032-888-6487",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.467389,
   "lng": 126.633638
  },
@@ -574,6 +626,7 @@ const facilities = [
   "phone": "032-710-1932",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.477103,
   "lng": 126.64296
  },
@@ -587,6 +640,7 @@ const facilities = [
   "phone": "032-773-1566",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.471582,
   "lng": 126.632248
  },
@@ -600,6 +654,7 @@ const facilities = [
   "phone": "032-765-0631",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.469474,
   "lng": 126.628547
  },
@@ -613,6 +668,7 @@ const facilities = [
   "phone": "032-772-3307",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.471362,
   "lng": 126.631181
  },
@@ -626,6 +682,7 @@ const facilities = [
   "phone": "032-765-5002",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.4789,
   "lng": 126.635385
  },
@@ -639,6 +696,7 @@ const facilities = [
   "phone": "032-202-7671",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.470932,
   "lng": 126.638971
  },
@@ -652,6 +710,7 @@ const facilities = [
   "phone": "032-233-0901",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.477202,
   "lng": 126.643805
  },
@@ -665,6 +724,8 @@ const facilities = [
   "phone": "032-713-8171",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "법인",
+  "corp": "사회적협동조합 동그라미",
   "lat": 37.473663,
   "lng": 126.636883
  },
@@ -678,6 +739,7 @@ const facilities = [
   "phone": "032-762-4104",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.470769,
   "lng": 126.639532
  },
@@ -691,6 +753,8 @@ const facilities = [
   "phone": "032-772-1664",
   "target": "장기요양 등급을 받은 어르신",
   "service": "재가노인지원서비스, 방문요양, 방문목욕, 경로식당(무료 점심), 거동불편 어르신 식사배달, 노인맞춤돌봄서비스(안전·생활 지원)",
+  "operatorType": "법인",
+  "corp": "재단법인거룩한말씀의 수녀회",
   "lat": 37.47892,
   "lng": 126.630224
  },
@@ -704,6 +768,8 @@ const facilities = [
   "phone": "032-764-1182",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "법인",
+  "corp": "사회복지법인 사랑의샘",
   "lat": 37.476059,
   "lng": 126.639716
  },
@@ -717,6 +783,7 @@ const facilities = [
   "phone": "032-761-1103",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.480031,
   "lng": 126.621251
  },
@@ -730,6 +797,7 @@ const facilities = [
   "phone": "032-761-7636",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.48109,
   "lng": 126.645314
  },
@@ -743,6 +811,7 @@ const facilities = [
   "phone": "032-887-5487",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.466282,
   "lng": 126.63656
  },
@@ -756,6 +825,7 @@ const facilities = [
   "phone": "032-584-8253",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문간호",
+  "operatorType": "개인",
   "lat": 37.477317,
   "lng": 126.650627
  },
@@ -769,6 +839,7 @@ const facilities = [
   "phone": "032-773-4457",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.47225,
   "lng": 126.642
  },
@@ -782,6 +853,7 @@ const facilities = [
   "phone": "032-891-1001",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.468155,
   "lng": 126.641641
  },
@@ -795,6 +867,7 @@ const facilities = [
   "phone": "032-217-0107",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.483401,
   "lng": 126.633298
  },
@@ -808,6 +881,7 @@ const facilities = [
   "phone": "032-766-8881",
   "target": "장기요양 등급을 받은 어르신",
   "service": "복지용구제공사업소",
+  "operatorType": "개인",
   "lat": 37.480629,
   "lng": 126.626993
  },
@@ -821,6 +895,7 @@ const facilities = [
   "phone": "032-777-0494",
   "target": "장기요양 등급을 받은 어르신",
   "service": "주야간보호",
+  "operatorType": "개인",
   "lat": 37.469246,
   "lng": 126.630287
  },
@@ -834,6 +909,7 @@ const facilities = [
   "phone": "032-772-2244",
   "target": "장기요양 등급을 받은 어르신",
   "service": "복지용구제공사업소",
+  "operatorType": "법인",
   "lat": 37.476801,
   "lng": 126.635841
  },
@@ -847,6 +923,8 @@ const facilities = [
   "phone": "032-766-8881",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕, 주야간보호",
+  "operatorType": "법인",
+  "corp": "주식회사우리다함께",
   "lat": 37.475218,
   "lng": 126.64355
  },
@@ -860,6 +938,7 @@ const facilities = [
   "phone": "032-777-8585",
   "target": "장기요양 등급을 받은 어르신",
   "service": "집으로 찾아가는 방문요양·방문목욕, 낮 시간 돌봄(주야간보호)",
+  "operatorType": "법인",
   "lat": 37.467495,
   "lng": 126.637329
  },
@@ -873,6 +952,7 @@ const facilities = [
   "phone": "032-773-9982",
   "target": "장기요양 등급을 받은 어르신",
   "service": "주야간보호",
+  "operatorType": "개인",
   "lat": 37.470364,
   "lng": 126.628054
  },
@@ -886,6 +966,7 @@ const facilities = [
   "phone": "070-4187-1055",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.475678,
   "lng": 126.627293
  },
@@ -899,6 +980,8 @@ const facilities = [
   "phone": "032-868-0330",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "법인",
+  "corp": "주식회사 하이원",
   "lat": 37.457173,
   "lng": 126.634082
  },
@@ -912,6 +995,7 @@ const facilities = [
   "phone": "032-777-3030",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.481753,
   "lng": 126.644653
  },
@@ -925,6 +1009,7 @@ const facilities = [
   "phone": "032-764-3577",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕, 방문간호",
+  "operatorType": "개인",
   "lat": 37.477874,
   "lng": 126.628881
  },
@@ -938,6 +1023,7 @@ const facilities = [
   "phone": "032-766-5506",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.473218,
   "lng": 126.642005
  },
@@ -951,6 +1037,7 @@ const facilities = [
   "phone": "032-216-1678",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.48189,
   "lng": 126.62997
  },
@@ -964,6 +1051,7 @@ const facilities = [
   "phone": "032-766-1153",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.48006,
   "lng": 126.629937
  },
@@ -977,6 +1065,7 @@ const facilities = [
   "phone": "032-256-3927",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양",
+  "operatorType": "개인",
   "lat": 37.478689,
   "lng": 126.645882
  },
@@ -990,6 +1079,7 @@ const facilities = [
   "phone": "032-763-9996",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.47285,
   "lng": 126.631137
  },
@@ -1002,7 +1092,8 @@ const facilities = [
   "address": "인천광역시 제물포구 인중로146번길 29",
   "phone": "032-777-8805",
   "target": "장기요양 등급을 받은 어르신",
-  "service": "방문요양, 방문목욕"
+  "service": "방문요양, 방문목욕",
+  "operatorType": "개인"
  },
  {
   "name": "효노인복지센터",
@@ -1014,6 +1105,7 @@ const facilities = [
   "phone": "032-888-3132",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕, 방문간호",
+  "operatorType": "개인",
   "lat": 37.465892,
   "lng": 126.636856
  },
@@ -1027,6 +1119,7 @@ const facilities = [
   "phone": "032-763-3359",
   "target": "장기요양 등급을 받은 어르신",
   "service": "방문요양, 방문목욕",
+  "operatorType": "개인",
   "lat": 37.469617,
   "lng": 126.638564
  },
@@ -1053,6 +1146,8 @@ const facilities = [
   "phone": "032-889-3114",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "법인",
+  "corp": "사회복지법인 정도원",
   "lat": 37.453453,
   "lng": 126.600392
  },
@@ -1066,6 +1161,8 @@ const facilities = [
   "phone": "032-773-2223",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "법인",
+  "corp": "기독교대한성결교회 사회사업유지재단",
   "lat": 37.474854,
   "lng": 126.643344
  },
@@ -1079,6 +1176,7 @@ const facilities = [
   "phone": "032-885-0707",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.453101,
   "lng": 126.600053
  },
@@ -1092,6 +1190,7 @@ const facilities = [
   "phone": "032-888-0333",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.457173,
   "lng": 126.634082
  },
@@ -1105,6 +1204,7 @@ const facilities = [
   "phone": "032-765-8887",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.479261,
   "lng": 126.62562
  },
@@ -1118,6 +1218,7 @@ const facilities = [
   "phone": "032-762-8553",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.471767,
   "lng": 126.630381
  },
@@ -1131,6 +1232,7 @@ const facilities = [
   "phone": "032-574-9998",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.473219,
   "lng": 126.637837
  },
@@ -1144,6 +1246,7 @@ const facilities = [
   "phone": "032-761-7730",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.473219,
   "lng": 126.637837
  },
@@ -1157,6 +1260,8 @@ const facilities = [
   "phone": "032-773-0665",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "법인",
+  "corp": "재단법인천주교 천주의섭리수녀회",
   "lat": 37.478102,
   "lng": 126.620444
  },
@@ -1170,6 +1275,7 @@ const facilities = [
   "phone": "032-772-6660",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.469907,
   "lng": 126.626296
  },
@@ -1183,6 +1289,7 @@ const facilities = [
   "phone": "032-766-8806",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.472093,
   "lng": 126.622408
  },
@@ -1196,6 +1303,7 @@ const facilities = [
   "phone": "032-777-8998",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.473367,
   "lng": 126.63185
  },
@@ -1209,6 +1317,7 @@ const facilities = [
   "phone": "032-764-8080",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.477586,
   "lng": 126.648639
  },
@@ -1222,6 +1331,7 @@ const facilities = [
   "phone": "032-772-0733",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.473219,
   "lng": 126.637837
  },
@@ -1235,6 +1345,7 @@ const facilities = [
   "phone": "070-8630-7550",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.473331,
   "lng": 126.629092
  },
@@ -1248,6 +1359,8 @@ const facilities = [
   "phone": "070-8630-7545",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "법인",
+  "corp": "예지의료재단",
   "lat": 37.471727,
   "lng": 126.631818
  },
@@ -1261,6 +1374,7 @@ const facilities = [
   "phone": "032-765-7977",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.474374,
   "lng": 126.631155
  },
@@ -1287,6 +1401,7 @@ const facilities = [
   "phone": "032-765-6651",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.474477,
   "lng": 126.626321
  },
@@ -1300,6 +1415,7 @@ const facilities = [
   "phone": "032-721-9924",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.468854,
   "lng": 126.624547
  },
@@ -1313,6 +1429,7 @@ const facilities = [
   "phone": "032-765-5588",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.472,
   "lng": 126.630651
  },
@@ -1326,6 +1443,7 @@ const facilities = [
   "phone": "032-762-1007",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.473219,
   "lng": 126.637837
  },
@@ -1339,6 +1457,7 @@ const facilities = [
   "phone": "032-763-7770",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.465598,
   "lng": 126.632612
  },
@@ -1352,6 +1471,7 @@ const facilities = [
   "phone": "032-763-0777",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.475036,
   "lng": 126.626963
  },
@@ -1365,6 +1485,7 @@ const facilities = [
   "phone": "032-777-8191",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.465598,
   "lng": 126.632612
  },
@@ -1378,6 +1499,7 @@ const facilities = [
   "phone": "032-777-0056",
   "target": "장기요양 1~2등급 등 시설 입소가 필요한 어르신",
   "service": "입소 생활, 요양·간호, 식사",
+  "operatorType": "개인",
   "lat": 37.474426,
   "lng": 126.621148
  },
@@ -1937,6 +2059,8 @@ const facilities = [
   "check": false,
   "target": "가정에서 생활하기 어려운 장애인",
   "service": "생활·자립 지원",
+  "operatorType": "법인",
+  "corp": "사회복지법인 백십자사",
   "lat": 37.473991,
   "lng": 126.641378
  },
@@ -1953,6 +2077,9 @@ const facilities = [
   "check": false,
   "target": "등록 장애인과 가족",
   "service": "상담, 재활치료, 직업재활, 교육·여가 프로그램",
+  "homepage": "http://www.hanmaeum.org/",
+  "operatorType": "법인",
+  "corp": "사회복지법인 한원복지재단",
   "lat": 37.481768,
   "lng": 126.625253
  },
@@ -1968,6 +2095,9 @@ const facilities = [
   "check": false,
   "target": "낮 시간 돌봄이 필요한 성인 장애인(발달장애인 등)",
   "service": "낮 시간 보호, 일상생활·사회적응 훈련, 여가 활동",
+  "homepage": "http://www.hanmaeum.org/",
+  "operatorType": "법인",
+  "corp": "사회복지법인 한원복지재단",
   "lat": 37.481768,
   "lng": 126.625253
  },
@@ -1983,6 +2113,8 @@ const facilities = [
   "check": false,
   "target": "일하기 원하는 18세 이상 장애인",
   "service": "직업훈련, 일자리, 직업상담",
+  "operatorType": "법인",
+  "corp": "사회복지법인 손과손",
   "lat": 37.482675,
   "lng": 126.664111
  },
@@ -1998,6 +2130,8 @@ const facilities = [
   "check": false,
   "target": "일하기 원하는 18세 이상 장애인",
   "service": "직업훈련, 일자리, 직업상담",
+  "operatorType": "법인",
+  "corp": "사회적협동조합 디딤",
   "lat": 37.489189,
   "lng": 126.620611
  },
@@ -2014,6 +2148,7 @@ const facilities = [
   "check": false,
   "target": "등록 장애인과 가족",
   "service": "상담, 재활치료, 직업재활, 교육·여가 프로그램",
+  "homepage": "https://www.jgwelfare.or.kr/",
   "lat": 37.452751,
   "lng": 126.628309
  },
@@ -2029,6 +2164,7 @@ const facilities = [
   "check": false,
   "target": "일하기 원하는 18세 이상 장애인",
   "service": "직업훈련, 일자리, 직업상담",
+  "homepage": "https://www.jgwelfare.or.kr/",
   "lat": 37.452751,
   "lng": 126.628309
  },
@@ -2044,6 +2180,7 @@ const facilities = [
   "check": false,
   "target": "낮 시간 돌봄이 필요한 성인 장애인(발달장애인 등)",
   "service": "낮 시간 보호, 일상생활·사회적응 훈련, 여가 활동",
+  "homepage": "https://www.jgwelfare.or.kr/",
   "lat": 37.452751,
   "lng": 126.628309
  },
@@ -2162,6 +2299,7 @@ const facilities = [
   "private": false,
   "target": "만 5세 이하 영유아 가정, 임산부",
   "service": "장난감·유아도서 대여",
+  "homepage": "https://www.dodamtoys.or.kr/",
   "lat": 37.476462,
   "lng": 126.648208
  },
@@ -2177,6 +2315,7 @@ const facilities = [
   "private": false,
   "target": "만 5세 이하 영유아 가정, 임산부",
   "service": "장난감·유아도서 대여",
+  "homepage": "https://www.dodamtoys.or.kr/",
   "lat": 37.476192,
   "lng": 126.628155
  },
@@ -2192,6 +2331,7 @@ const facilities = [
   "private": false,
   "target": "청소년(9~24세)",
   "service": "수련활동, 동아리, 청소년 프로그램",
+  "homepage": "http://www.youth7942.or.kr/",
   "lat": 37.476055,
   "lng": 126.642571
  },
@@ -2237,6 +2377,7 @@ const facilities = [
   "private": false,
   "target": "학대 피해 아동과 가족",
   "service": "아동학대 신고 접수·상담, 치료·사례관리",
+  "homepage": "https://www.icyism.or.kr/",
   "lat": 37.480695,
   "lng": 126.634232
  },
@@ -2252,6 +2393,7 @@ const facilities = [
   "private": false,
   "target": "보호자가 돌보기 어려운 아동",
   "service": "생활·양육, 학습·자립 지원",
+  "homepage": "http://cwc.boramae21.org/",
   "lat": 37.482302,
   "lng": 126.627906
  },
@@ -2417,6 +2559,7 @@ const facilities = [
   "private": false,
   "target": "모든 가족, 한부모·다문화가족",
   "service": "가족상담, 부모교육, 맞벌이가정 양육코칭, 한국어교육, 통번역, 다문화가족 방문교육, 다문화 자녀 언어발달·학습 지원, 결혼이민자 취업지원, 자조모임, 가족상담·교육, 다문화가족 지원",
+  "homepage": "https://icdonggu.familynet.or.kr/center/index.do",
   "lat": 37.476499,
   "lng": 126.635574
  },
@@ -2433,6 +2576,7 @@ const facilities = [
   "private": false,
   "target": "기초생활수급자, 차상위계층 등 저소득층",
   "service": "자활근로, 일자리·취업 지원",
+  "homepage": "https://www.happyjahwal.or.kr/",
   "lat": 37.475218,
   "lng": 126.64355
  },
@@ -2494,6 +2638,7 @@ const facilities = [
   "private": false,
   "target": "지역 주민(특히 저소득층, 어르신, 아동, 장애인)",
   "service": "거동불편 어르신 식사배달, 사례관리, 돌봄·교육·문화 프로그램, 지역 주민 지원",
+  "homepage": "http://www.migael.net/",
   "lat": 37.47444,
   "lng": 126.627263
  },
@@ -2524,6 +2669,7 @@ const facilities = [
   "private": false,
   "target": "지역 주민(특히 저소득층, 어르신, 아동, 장애인)",
   "service": "경로식당(무료 점심), 거동불편 어르신 식사배달, 사례관리, 돌봄·교육·문화 프로그램, 지역 주민 지원",
+  "homepage": "https://www.mycy.or.kr/",
   "lat": 37.47105,
   "lng": 126.641179
  },
@@ -2554,6 +2700,8 @@ const facilities = [
   "private": false,
   "target": "지역 주민",
   "service": "예방접종, 건강검진, 진료, 건강상담",
+  "homepage": "https://www.jemulpo.go.kr/clinic/",
+  "operatorType": "지방자치단체",
   "lat": 37.477205,
   "lng": 126.62911
  },
@@ -2570,6 +2718,7 @@ const facilities = [
   "private": false,
   "target": "만 60세 이상 주민, 치매 환자와 가족",
   "service": "치매 조기검진, 치매 예방교실, 치매 환자 등록·지원, 가족 상담",
+  "homepage": "https://jemulpo.nid.or.kr/main/main.aspx",
   "lat": 37.477205,
   "lng": 126.62911
  },
@@ -2585,6 +2734,7 @@ const facilities = [
   "private": false,
   "target": "마음이 힘든 주민, 정신질환자와 가족",
   "service": "정신건강 상담, 자살예방, 사례관리",
+  "homepage": "http://www.idcm.or.kr/",
   "lat": 37.479897,
   "lng": 126.666565
  },
@@ -2600,6 +2750,7 @@ const facilities = [
   "private": false,
   "target": "알코올·도박·마약·인터넷 중독으로 힘든 주민과 가족",
   "service": "중독 상담, 치료 연계, 예방교육",
+  "homepage": "http://www.icdacc.org/",
   "lat": 37.479897,
   "lng": 126.666565
  },
@@ -2615,6 +2766,7 @@ const facilities = [
   "private": false,
   "target": "지역 주민",
   "service": "혈압·혈당 등 건강검사, 운동·영양·금연 상담",
+  "homepage": "https://www.jemulpo.go.kr/clinic/health/center.jsp",
   "lat": 37.476462,
   "lng": 126.648208
  },
@@ -2695,6 +2847,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "가정",
   "lat": 37.466924,
   "lng": 126.630617
  },
@@ -2710,6 +2863,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.467445,
   "lng": 126.638437
  },
@@ -2725,6 +2879,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.47363,
   "lng": 126.641198
  },
@@ -2740,6 +2895,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "가정",
   "lat": 37.478787,
   "lng": 126.637548
  },
@@ -2755,6 +2911,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "가정",
   "lat": 37.478787,
   "lng": 126.637548
  },
@@ -2770,6 +2927,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "민간",
   "lat": 37.482958,
   "lng": 126.632145
  },
@@ -2785,6 +2943,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "민간",
   "lat": 37.474229,
   "lng": 126.649457
  },
@@ -2800,6 +2959,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "직장",
   "lat": 37.466374,
   "lng": 126.632338
  },
@@ -2815,6 +2975,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "가정",
   "lat": 37.45737,
   "lng": 126.633217
  },
@@ -2830,6 +2991,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "직장",
   "lat": 37.482272,
   "lng": 126.650666
  },
@@ -2845,6 +3007,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.471403,
   "lng": 126.649257
  },
@@ -2860,6 +3023,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.478433,
   "lng": 126.647903
  },
@@ -2875,6 +3039,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.481576,
   "lng": 126.620766
  },
@@ -2890,6 +3055,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "가정",
   "lat": 37.451767,
   "lng": 126.604978
  },
@@ -2905,6 +3071,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "가정",
   "lat": 37.45737,
   "lng": 126.633217
  },
@@ -2920,6 +3087,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.477235,
   "lng": 126.652998
  },
@@ -2935,6 +3103,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.476661,
   "lng": 126.619777
  },
@@ -2950,6 +3119,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.468082,
   "lng": 126.633279
  },
@@ -2965,6 +3135,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "민간",
   "lat": 37.45737,
   "lng": 126.633217
  },
@@ -2980,6 +3151,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.478437,
   "lng": 126.645889
  },
@@ -2995,6 +3167,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "민간",
   "lat": 37.480762,
   "lng": 126.651652
  },
@@ -3010,6 +3183,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "직장",
   "lat": 37.481872,
   "lng": 126.634072
  },
@@ -3025,6 +3199,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "가정",
   "lat": 37.481753,
   "lng": 126.644653
  },
@@ -3040,6 +3215,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.45737,
   "lng": 126.633217
  },
@@ -3055,6 +3231,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.47505,
   "lng": 126.643829
  },
@@ -3070,6 +3247,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "가정",
   "lat": 37.478787,
   "lng": 126.637548
  },
@@ -3085,6 +3263,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "민간",
   "lat": 37.471738,
   "lng": 126.633008
  },
@@ -3100,6 +3279,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.484267,
   "lng": 126.620146
  },
@@ -3115,6 +3295,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "민간",
   "lat": 37.477105,
   "lng": 126.634685
  },
@@ -3130,6 +3311,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "민간",
   "lat": 37.485154,
   "lng": 126.622702
  },
@@ -3145,6 +3327,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.469924,
   "lng": 126.624817
  },
@@ -3160,6 +3343,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.451797,
   "lng": 126.62721
  },
@@ -3175,6 +3359,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "직장",
   "lat": 37.464355,
   "lng": 126.63453
  },
@@ -3190,6 +3375,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "직장",
   "lat": 37.478797,
   "lng": 126.668656
  },
@@ -3205,6 +3391,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "직장",
   "lat": 37.473154,
   "lng": 126.623155
  },
@@ -3220,6 +3407,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.478787,
   "lng": 126.637548
  },
@@ -3235,6 +3423,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.471963,
   "lng": 126.634798
  },
@@ -3250,6 +3439,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "민간",
   "lat": 37.471531,
   "lng": 126.650246
  },
@@ -3265,6 +3455,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "직장",
   "lat": 37.474027,
   "lng": 126.622362
  },
@@ -3280,6 +3471,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "가정",
   "lat": 37.465742,
   "lng": 126.638598
  },
@@ -3295,6 +3487,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.451767,
   "lng": 126.604978
  },
@@ -3310,6 +3503,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.452751,
   "lng": 126.628309
  },
@@ -3325,6 +3519,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "가정",
   "lat": 37.480762,
   "lng": 126.651652
  },
@@ -3340,6 +3535,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.475109,
   "lng": 126.635686
  },
@@ -3355,6 +3551,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "민간",
   "lat": 37.482272,
   "lng": 126.650666
  },
@@ -3370,6 +3567,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.478787,
   "lng": 126.637548
  },
@@ -3385,6 +3583,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "직장",
   "lat": 37.467425,
   "lng": 126.642621
  },
@@ -3400,6 +3599,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "가정",
   "lat": 37.481107,
   "lng": 126.636592
  },
@@ -3415,6 +3615,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "직장",
   "lat": 37.484348,
   "lng": 126.647693
  },
@@ -3430,6 +3631,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.483673,
   "lng": 126.628074
  },
@@ -3445,6 +3647,7 @@ const facilities = [
   "private": false,
   "target": "만 0~5세 영유아",
   "service": "보육(종일·시간제 등 어린이집 유형에 따라 다름)",
+  "operatorType": "국공립",
   "lat": 37.479499,
   "lng": 126.631894
  },
@@ -3557,6 +3760,7 @@ const facilities = [
   "hours": "월,화,수,목,금 / 평일 09:00~18:00",
   "target": "누구나 (특히 어르신)",
   "service": "폭염 때 더위 피하기",
+  "homepage": "http://www.hanmaeum.org/",
   "lat": 37.481768,
   "lng": 126.625253
  },
@@ -4342,6 +4546,8 @@ const facilities = [
   "hours": "",
   "target": "누구나 (특히 어르신)",
   "service": "폭염 때 더위 피하기",
+  "operatorType": "법인",
+  "corp": "사단법인 더함께새희망",
   "lat": 37.467803,
   "lng": 126.633882
  },

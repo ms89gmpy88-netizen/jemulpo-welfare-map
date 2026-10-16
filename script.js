@@ -34,7 +34,7 @@ function show() {
     ? current.map((f, i) => `
       <article class="card${f.lat ? " has-pin" : ""}" data-i="${i}">
         ${f.categories.map(c => `<span class="tag">${esc(c)}</span>`).join("")}<span class="tag">${esc(f.type)}</span>${f.check ? '<span class="tag check">확인 필요</span>' : ""}
-        <h3>${esc(f.name)}</h3>
+        <h3><button class="name-btn" type="button" title="상세정보 보기">${esc(f.name)}</button></h3>
         ${f.target ? `<p class="who"><b>대상</b> ${esc(f.target)}</p>` : ""}
         ${f.service ? `<p class="who"><b>하는 일</b> ${esc(f.service)}</p>` : ""}
         ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소와 전화번호를 공개하지 않습니다.</p>" : `
@@ -63,15 +63,75 @@ function openInfo(f) {
   info.open(map, f.marker);
 }
 
-// 카드의 '지도에서 보기'를 누르면 지도를 그 기관으로 옮깁니다.
-document.getElementById("cards").addEventListener("click", e => {
-  if (!e.target.closest(".pin-btn") || !map) return;
-  const f = current[e.target.closest(".card").dataset.i];
+function focusOnMap(f) {
   map.setLevel(3);
   map.panTo(f.marker.getPosition());
   openInfo(f);
   document.getElementById("map").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+// 카드: 이름을 누르면 상세정보, '지도에서 보기'를 누르면 지도를 그 기관으로 옮깁니다.
+document.getElementById("cards").addEventListener("click", e => {
+  const card = e.target.closest(".card");
+  if (!card) return;
+  const f = current[card.dataset.i];
+  if (e.target.closest(".name-btn")) openDetail(f);
+  else if (e.target.closest(".pin-btn") && map) focusOnMap(f);
 });
+
+const dialog = document.getElementById("detail");
+const row = (label, value) => `<tr><th>${label}</th><td>${value || '<span class="none">정보 없음</span>'}</td></tr>`;
+
+function openDetail(f) {
+  const shelter = f.categories.some(c => c === "대피소" || c === "쉼터");
+  document.getElementById("detail-body").innerHTML = `
+    <p class="tags">${f.categories.map(c => `<span class="tag">${esc(c)}</span>`).join("")}</p>
+    <h2 id="detail-name">${esc(f.name)}</h2>
+    ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소·전화·사진을 공개하지 않습니다.</p>" : `
+    <h3>사진</h3>
+    <div id="roadview" class="roadview"><p>${f.lat ? "거리 사진을 불러오는 중입니다…" : "주소 위치를 찾지 못해 거리 사진을 보여 드릴 수 없습니다."}</p></div>
+    <p class="note">바깥 모습: 카카오 로드뷰 거리 사진입니다. 촬영 시기에 따라 지금 모습과 다를 수 있습니다.<br>
+      내부 사진: 기관이 공개한 사진 자료가 없어 싣지 않았습니다.${f.homepage ? " 홈페이지에서 확인해 보세요." : ""}</p>`}
+    <table class="info-table">
+      ${f.private ? "" : row("주소", esc(f.address))}
+      ${f.private ? "" : row("연락처", f.phone && `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>`)}
+      ${f.private ? "" : row("홈페이지", f.homepage && `<a href="${esc(f.homepage)}" target="_blank" rel="noopener">${esc(f.homepage.replace(/^https?:\/\//, "").replace(/\/$/, ""))}</a>`)}
+      ${shelter ? "" : row("운영주체 구분", esc(f.operatorType || ""))}
+      ${row("시설 종류", esc(f.type))}
+      ${shelter ? "" : row("법인명", esc(f.corp || ""))}
+      ${f.target ? row("대상", esc(f.target)) : ""}
+      ${f.service ? row("하는 일", esc(f.service)) : ""}
+      ${f.hours ? row("운영", esc(f.hours)) : ""}
+    </table>
+    ${f.lat ? `<p class="actions">
+      <button class="pin-btn" type="button" id="detail-map">지도에서 보기</button>
+      <a class="pin-btn" href="https://map.kakao.com/link/to/${encodeURIComponent(f.name)},${f.lat},${f.lng}" target="_blank" rel="noopener">길찾기 (카카오맵)</a>
+    </p>` : ""}`;
+  dialog.showModal();
+  document.getElementById("detail-map")?.addEventListener("click", () => { dialog.close(); focusOnMap(f); });
+  if (f.lat && !f.private && window.kakao && kakao.maps.RoadviewClient) showRoadview(f);
+}
+
+// 기관 위치에서 가장 가까운 로드뷰(50m 안)를 보여 줍니다.
+function showRoadview(f) {
+  const box = document.getElementById("roadview");
+  const pos = new kakao.maps.LatLng(f.lat, f.lng);
+  new kakao.maps.RoadviewClient().getNearestPanoId(pos, 50, panoId => {
+    if (!panoId) { box.innerHTML = "<p>이 주변은 카카오 로드뷰 거리 사진이 없습니다.</p>"; return; }
+    box.innerHTML = "";
+    const rv = new kakao.maps.Roadview(box);
+    rv.setPanoId(panoId, pos);
+    // 건물 쪽을 바라보도록 방향을 맞춥니다.
+    kakao.maps.event.addListener(rv, "init", () => {
+      const p = rv.getPosition();
+      const pan = Math.atan2(f.lng - p.getLng(), f.lat - p.getLat()) * 180 / Math.PI;
+      rv.setViewpoint({ pan: (pan + 360) % 360, tilt: 0, zoom: 0 });
+    });
+  });
+}
+
+dialog.querySelector(".close").addEventListener("click", () => dialog.close());
+dialog.addEventListener("click", e => { if (e.target === dialog) dialog.close(); }); // 바깥(어두운 곳) 누르면 닫기
 
 // 휴대폰에서 지도가 메뉴 바로 아래에 붙도록 메뉴 높이를 CSS에 알려 줍니다.
 document.documentElement.style.setProperty("--menu-h", document.querySelector(".menu").offsetHeight + "px");

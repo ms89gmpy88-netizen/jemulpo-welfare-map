@@ -15,10 +15,10 @@ const extra = f => f.categories.some(c => c === "대피소" || c === "쉼터") ?
 ].filter(Boolean);
 
 const facilities = [
-  ...parse("노인복지시설현황.csv").map(r => ({ name: r["시설명"], categories: ["어르신"], type: r["시설종류"], address: r["소재지"], phone: r["연락처"] })),
+  ...parse("노인복지시설현황.csv").map(r => ({ name: r["시설명"], categories: ["어르신"], type: r["시설종류"], address: r["소재지"], phone: r["연락처"], operator: r["운영주체(법인명)"] })),
   ...parse("노인요양시설현황.csv").map(r => ({ name: r["시설명"], categories: ["어르신"], type: "노인요양시설", address: r["주소"], phone: r["전화번호"] })),
   ...parse("경로당현황.csv").map(r => ({ name: r["경로당명"], categories: ["어르신"], type: "경로당", address: r["도로명주소"], phone: r["전화번호"], check: r["확인상태"] === "확인 필요" })),
-  ...parse("장애인복지시설현황.csv").map(r => ({ name: r["시설명"], categories: ["장애인"], type: r["시설유형"], address: r["소재지"], phone: r["연락처"], check: r["확인상태"] === "확인 필요" })),
+  ...parse("장애인복지시설현황.csv").map(r => ({ name: r["시설명"], categories: ["장애인"], type: r["시설유형"], address: r["소재지"], phone: r["연락처"], operator: r["운영주체(법인명)"], check: r["확인상태"] === "확인 필요" })),
   // 보호시설·공동생활가정은 '주소 비공개'로 이름만 싣습니다.
   ...parse("기타복지시설.csv").map(r => ({ name: r["시설명"], categories: r["분야"].split("|"), type: r["시설유형"], address: r["소재지"], phone: r["연락처"], check: r["확인상태"] === "확인 필요", private: r["확인상태"] === "주소 비공개" })),
   // 대피소·쉼터는 국민안전24 등에서 모은 자료입니다 (운영시간 칸이 있음).
@@ -35,6 +35,22 @@ facilities.forEach(f => {
   if (g) [f.target, f.service] = [g[1], g[2]];
   // 재가·장기요양기관은 구청 급여종류가 그 기관의 실제 서비스이므로 일반 안내를 붙이지 않습니다.
   if (own[f.name]) f.service = own[f.name] + (f.service && !/재가|장기요양/.test(f.type) ? ", " + f.service : "");
+});
+
+// 상세정보: 운영주체구분·법인명·홈페이지 (CSV의 운영주체 칸 + 기관상세.csv)
+const detail = Object.fromEntries(parse("기관상세.csv").map(r => [r["시설명"], r]));
+const CORP = /법인|재단|협동조합|주식회사|㈜|협회|산학협력단|교회|수녀회|복지회|공사/;
+facilities.forEach(f => {
+  const d = detail[f.name] || {};
+  const op = (d["운영주체"] || f.operator || "").trim();
+  delete f.operator;
+  if (d["홈페이지"]) f.homepage = d["홈페이지"];
+  const kid = f.type.match(/어린이집\((국공립|민간|가정|직장|법인|사회복지법인|협동)/);
+  if (kid) f.operatorType = kid[1];                       // 어린이집은 설립 유형
+  else if (/^개인$/.test(op)) f.operatorType = "개인";
+  else if (/지방자치단체|구립|시립/.test(op) || /보건소/.test(f.type)) f.operatorType = "지방자치단체";
+  else if (op === "법인") f.operatorType = "법인";        // 법인 이름은 자료에 없음
+  else if (CORP.test(op)) [f.operatorType, f.corp] = ["법인", op];
 });
 
 // 지도 좌표: coords.json (주소 → [위도, 경도]), 카카오 주소 검색으로 만든 파일입니다.

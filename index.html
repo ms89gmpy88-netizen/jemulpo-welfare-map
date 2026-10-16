@@ -37,6 +37,12 @@
     </section>
   </main>
 
+  <!-- 기관 이름을 누르면 열리는 상세정보 창 (script.js의 openDetail) -->
+  <dialog id="detail" class="detail" aria-labelledby="detail-name">
+    <button class="close" type="button" aria-label="닫기">✕</button>
+    <div id="detail-body"></div>
+  </dialog>
+
   <!-- 카카오 지도 JavaScript 키: developers.kakao.com 에 등록한 주소에서만 작동합니다 -->
   <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=5ccf8384fc379837ac46da7b9356a95c&autoload=false&libraries=clusterer"></script>
   <script src="facilities.js"></script>
