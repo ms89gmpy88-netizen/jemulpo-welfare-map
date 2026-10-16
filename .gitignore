@@ -1,3 +1,6 @@
 # 브라우저 확인용 캡처·임시 파일 (Playwright)
 .playwright-mcp/
 node_modules/
+
+# 공공데이터포털 인증키 (비밀, 저장하지 않음)
+data/.api-key

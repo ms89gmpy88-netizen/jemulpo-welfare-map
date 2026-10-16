@@ -114,7 +114,7 @@ function openDetail(f) {
     <table class="info-table">
       ${["휠체어 출입", "엘리베이터", "주차", "장애인 화장실"].map(k => row(k, esc(f.access?.[k] || ""))).join("")}
     </table>
-    <p class="note">${f.access?.["출처"] ? "출처: " + esc(f.access["출처"]) : "아직 확인된 이용 편의 정보가 없습니다. 방문 전에 전화로 확인하세요."}</p>`}
+    <p class="note">${f.access?.["출처"] ? "출처: " + esc(f.access["출처"]) + "<br>기관이 들어 있는 건물 기준이며, '자료에 없음'은 설치되지 않았다는 뜻이 아닐 수 있습니다. 방문 전에 전화로 확인하세요." : "아직 확인된 이용 편의 정보가 없습니다. 방문 전에 전화로 확인하세요."}</p>`}
     ${f.lat ? `<p class="actions">
       <button class="pin-btn" type="button" id="detail-map">지도에서 보기</button>
       <a class="pin-btn" href="https://map.kakao.com/link/to/${encodeURIComponent(f.name)},${f.lat},${f.lng}" target="_blank" rel="noopener">길찾기 (카카오맵)</a>

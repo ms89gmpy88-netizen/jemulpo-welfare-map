@@ -72,8 +72,12 @@ facilities.forEach(f => { if (coords[f.address]) [f.lat, f.lng] = coords[f.addre
 const km = (a, b) => { const r = Math.PI / 180, x = (b.lng - a.lng) * r * Math.cos((a.lat + b.lat) * r / 2), y = (b.lat - a.lat) * r; return Math.hypot(x, y) * 6371; };
 // 이름은 옛 구 이름(동구·중구·제물포구·인천)을 빼고 비교합니다. 예) 쉼터 목록의 '동구노인복지관' = '제물포노인복지관'
 const core = n => n.replace(/\s/g, "").replace(/^(인천)?(동구|중구|제물포구?)/, "");
-const same = (a, b) => core(a.name) === core(b.name) &&
-  (a.lat && b.lat ? km(a, b) < 0.3 : !!a.phone && a.phone === b.phone);
+// 이름이 똑같으면 300m 안, 구 이름만 다르면(예: 인천중구주간보호센터 ≠ 제물포구주간보호센터) 같은 건물(30m 안)일 때만 합칩니다.
+const same = (a, b) => {
+  if (core(a.name) !== core(b.name)) return false;
+  const exact = a.name.replace(/\s/g, "") === b.name.replace(/\s/g, "");
+  return a.lat && b.lat ? km(a, b) < (exact ? 0.3 : 0.03) : exact && !!a.phone && a.phone === b.phone;
+};
 const isShelter = f => f.categories.every(c => c === "대피소" || c === "쉼터");
 const rank = f => (isShelter(f) ? 2 : 0) + (/(로|길)\s?\d/.test(f.address) ? 0 : 1); // 복지시설·도로명주소를 대표로
 const uniq = (list, sep) => [...new Set(list.filter(Boolean).flatMap(s => s.split(sep)).map(s => s.trim()))].join(sep);
