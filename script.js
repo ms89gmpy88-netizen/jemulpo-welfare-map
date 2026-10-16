@@ -208,6 +208,7 @@ function openDetail(f) {
       ${row("시설 종류", esc(f.type))}
       ${shelter ? "" : row("법인명", esc(f.corp || ""))}
     </table>
+    ${f.hot ? `<p class="note">고른 기준: ${esc(f.hot)}. 제물포구청이 추천하는 곳이 아니며, 광고를 받지 않았습니다.</p>` : ""}
     ${f.private ? "" : `<h3>이용 편의</h3>
     <table class="info-table">
       ${["휠체어 출입", "엘리베이터", "주차", "장애인 화장실"].map(k => row(k, esc(f.access?.[k] || ""))).join("")}

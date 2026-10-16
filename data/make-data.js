@@ -25,6 +25,11 @@ const facilities = [
   ...parse("대피소쉼터.csv").map(r => ({ name: r["시설명"], categories: r["분야"].split("|"), type: r["시설유형"], address: r["소재지"], phone: r["연락처"], hours: r["운영시간"], phoneLabel: r["문의처"] || undefined })),
   // 안전·보건(경찰·해양경찰·소방): 공식 홈페이지 + 카카오맵·네이버 플레이스로 확인한 곳
   ...parse("안전보건.csv").map(r => ({ name: r["시설명"], categories: [r["분야"]], type: r["시설유형"], address: r["소재지"], phone: r["연락처"] })),
+  // 핫플레이스: 관광명소는 제물포구청 동행투어 코스, 맛집·카페는 네이버 검색 인기순(광고·전국 프랜차이즈 제외)
+  ...parse("핫플레이스.csv").map(r => ({ name: r["시설명"], categories: [r["분야"]], type: r["시설유형"], address: r["소재지"], phone: r["연락처"], hours: r["운영시간"],
+    target: "누구나", service: r["분야"] === "관광명소" ? r["시설유형"] + " (제물포구청 역사문화해설사 동행투어 코스)" : r["시설유형"],
+    how: r["분야"] === "관광명소" ? "해설사와 함께 둘러보려면 제물포구청 문화관광과(032-773-7511)에 동행투어를 예약합니다(화~일 10~17시, 무료)." : "영업시간·휴무일은 가게 사정으로 바뀔 수 있으니 가기 전에 전화나 지도 앱으로 확인하세요.",
+    hot: r["출처"] })),
 ].map(f => ({ ...f, categories: [...new Set([...f.categories, ...extra(f)])] }));
 
 // 대상·하는 일: 시설 종류별 일반 안내 + 기관별로 확인한 사업(기관별사업.csv)
@@ -34,7 +39,7 @@ facilities.forEach(f => {
   // 대피소·쉼터는 이름(예: ○○경로당)이 아니라 종류로만 맞춥니다.
   const shelter = f.categories.some(c => c === "대피소" || c === "쉼터");
   const g = guide.find(([re]) => re.test(shelter ? f.type : f.type + " " + f.name));
-  if (g) [f.target, f.service, f.how] = [g[1], g[2], g[3]];
+  if (g && !f.target) [f.target, f.service, f.how] = [g[1], g[2], g[3]];
   // 재가·장기요양기관은 구청 급여종류가 그 기관의 실제 서비스이므로 일반 안내를 붙이지 않습니다.
   if (own[f.name]) f.service = own[f.name] + (f.service && !/재가|장기요양/.test(f.type) ? ", " + f.service : "");
 });
