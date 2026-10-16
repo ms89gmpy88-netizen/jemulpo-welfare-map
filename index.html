@@ -11,55 +11,57 @@
 </head>
 <body>
   <header class="top">
-    <div class="top-in">
-      <div>
-        <h1>제물포 복지지도</h1>
-        <p>복지시설·대피소·쉼터, 우리 동네에서 한눈에 찾기</p>
-      </div>
+    <div class="brand">
+      <h1>제물포 복지지도</h1>
+      <p>복지시설·대피시설·안전·핫플레이스, 우리 동네에서 한눈에 찾기</p>
+    </div>
+    <div class="search-box">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" class="search" type="search" placeholder="이름·동·대상·하는 일 (예: 치매)" aria-label="전체에서 검색">
+    </div>
+    <div class="tools">
+      <button id="near" class="tool-btn" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span>내 주변</span></button>
+      <button id="map-toggle" class="tool-btn only-narrow" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg><span>지도 접기</span></button>
       <button id="big-text" class="big-btn" type="button" aria-pressed="false">가 글씨 크게</button>
     </div>
   </header>
 
-  <nav class="menu" aria-label="복지 분야">
-    <button class="active" data-category="전체">전체</button>
-    <button data-category="어르신">어르신</button>
-    <button data-category="장애인">장애인</button>
-    <button data-category="여성/아동">여성/아동</button>
-    <button data-category="한부모/다문화">한부모/다문화</button>
-    <button data-category="복지관/자활">복지관/자활</button>
-    <button data-category="건강/재활">건강/재활</button>
-    <button data-category="대피소">대피소</button>
-    <button data-category="쉼터">쉼터</button>
-  </nav>
+  <div class="app">
+    <!-- 왼쪽: 대분야 (script.js의 GROUPS) -->
+    <nav class="rail" id="rail" aria-label="대분야"></nav>
 
-  <main class="layout">
-    <section class="list">
-      <div class="search-box">
-        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="search" class="search" type="search" placeholder="이름·동·대상·하는 일 (예: 치매)" aria-label="기관 검색">
-      </div>
-      <div class="tools">
-        <button id="near" class="tool-btn" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span>내 주변 가까운 순</span></button>
-        <button id="map-toggle" class="tool-btn" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg><span>지도 접기</span></button>
-      </div>
-      <p id="near-msg" class="near-msg" hidden></p>
-      <h2>기관 목록 <span id="count"></span></h2>
-      <details class="notice">
-        <summary>자료 출처와 이용 안내</summary>
-        <p>출처: 공공데이터포털 제물포구 자료, 제물포구청·보건소 홈페이지, 인천시 자료, 국민안전24(대피소·쉼터), 각 기관 홈페이지 (2026년 10월 확인). '대상'과 '하는 일'은 시설 종류에 따른 일반 안내에 구청에서 확인한 기관별 사업을 더한 것이라 기관마다 다를 수 있습니다. 방문 전 전화로 확인하세요.</p>
-      </details>
-      <div id="cards"></div>
+    <!-- 대분야 안의 세부 항목 (체크박스, 여러 개 고를 수 있음) -->
+    <section class="filters" aria-labelledby="group-name">
+      <h2 id="group-name"></h2>
+      <div class="subs" id="subs"></div>
+      <p class="filters-note" id="filters-note" hidden></p>
     </section>
 
     <section class="map" id="map" aria-label="지도">
       <p><strong>지도를 불러오지 못했습니다.</strong><br>'실행.bat'을 더블클릭해서 열어 주세요.</p>
     </section>
-  </main>
 
-  <!-- 기관 이름을 누르면 열리는 상세정보 창 (script.js의 openDetail) -->
+    <!-- 오른쪽: 목록 (누르면 같은 자리에 상세정보) -->
+    <section class="list" id="list" aria-label="목록">
+      <div id="list-view">
+        <div class="list-head">
+          <h2 id="list-title">목록 <span id="count"></span></h2>
+          <p id="near-msg" class="near-msg" hidden></p>
+          <details class="notice">
+            <summary>자료 출처와 이용 안내</summary>
+            <p>출처: 공공데이터포털 제물포구 자료, 제물포구청·보건소 홈페이지, 인천시 자료, 국민안전24(대피시설), 각 기관 홈페이지, 어린이집정보공개포털, 카카오맵·네이버 플레이스 (2026년 10월 확인). '대상'과 '하는 일'은 시설 종류에 따른 일반 안내에 구청에서 확인한 기관별 사업을 더한 것이라 기관마다 다를 수 있습니다. 방문 전 전화로 확인하세요.</p>
+          </details>
+        </div>
+        <ul class="rows" id="cards"></ul>
+      </div>
+      <div id="detail-view" class="detail-view dbody" hidden></div>
+    </section>
+  </div>
+
+  <!-- 휴대폰에서 상세정보 창 (컴퓨터에서는 오른쪽 목록 자리에 나옵니다) -->
   <dialog id="detail" class="detail" aria-labelledby="detail-name">
     <button class="close" type="button" aria-label="닫기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-    <div id="detail-body"></div>
+    <div id="detail-body" class="dbody"></div>
   </dialog>
 
   <!-- 카카오 지도 JavaScript 키: developers.kakao.com 에 등록한 주소에서만 작동합니다 -->

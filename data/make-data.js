@@ -108,7 +108,15 @@ facilities.forEach(f => { if (hours[f.name]) f.hours = hours[f.name]; });
 const hoursMissing = Object.keys(hours).filter(n => !facilities.some(f => f.name === n));
 if (hoursMissing.length) console.log("운영시간.csv에만 있고 목록에 없는 이름: " + hoursMissing.join(", "));
 
-const tabs = ["어르신", "장애인", "여성/아동", "한부모/다문화", "복지관/자활", "건강/재활", "대피소", "쉼터"];
+// 화면의 세부 항목(체크박스)으로 나눕니다. 대피소·쉼터는 시설유형 글자로 나눕니다.
+// 예) '경로당·무더위쉼터·한파쉼터' → 어르신 + 무더위쉼터 + 한파쉼터
+const shelterSubs = [[/지진옥외/, "지진옥외 대피소"], [/화학사고/, "화학사고 대피소"], [/민방위/, "민방위 대피소"], [/임시주거/, "임시주거시설"], [/한파쉼터/, "한파쉼터"], [/무더위쉼터/, "무더위쉼터"]];
+facilities.forEach(f => {
+  f.categories = [...new Set(f.categories.flatMap(c => c === "대피소" || c === "쉼터"
+    ? shelterSubs.filter(([re]) => re.test(f.type)).map(([, s]) => s) : [c]))];
+});
+const tabs = ["어르신", "장애인", "여성/아동", "한부모/다문화", "복지관/자활", "건강/재활",
+  ...shelterSubs.map(([, s]) => s), "경찰서", "해양경찰서", "소방서", "관광명소", "맛집", "분위기 좋은 카페"];
 console.assert(facilities.every(f => f.name && (f.address || f.private) && f.categories.every(c => tabs.includes(c))), "이름·주소가 비었거나 분야 이름이 틀린 기관이 있습니다");
 fs.writeFileSync(path.join(__dirname, "..", "facilities.js"),
   "// data/make-data.js 로 자동 생성된 파일입니다. 직접 고치지 말고 CSV를 고친 뒤 다시 만드세요.\nconst facilities = " +
