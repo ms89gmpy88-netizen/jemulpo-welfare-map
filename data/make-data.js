@@ -32,7 +32,7 @@ facilities.forEach(f => {
   // 대피소·쉼터는 이름(예: ○○경로당)이 아니라 종류로만 맞춥니다.
   const shelter = f.categories.some(c => c === "대피소" || c === "쉼터");
   const g = guide.find(([re]) => re.test(shelter ? f.type : f.type + " " + f.name));
-  if (g) [f.target, f.service] = [g[1], g[2]];
+  if (g) [f.target, f.service, f.how] = [g[1], g[2], g[3]];
   // 재가·장기요양기관은 구청 급여종류가 그 기관의 실제 서비스이므로 일반 안내를 붙이지 않습니다.
   if (own[f.name]) f.service = own[f.name] + (f.service && !/재가|장기요양/.test(f.type) ? ", " + f.service : "");
 });
@@ -53,15 +53,54 @@ facilities.forEach(f => {
   else if (CORP.test(op)) [f.operatorType, f.corp] = ["법인", op];
 });
 
+// 사진(기관이 허락한 사진만, data/사진 폴더)과 이용편의 정보(휠체어·엘리베이터·주차)
+const photos = parse("기관사진.csv");
+const access = Object.fromEntries(parse("이용편의.csv").map(r => [r["시설명"], r]));
+facilities.forEach(f => {
+  const p = photos.filter(r => r["시설명"] === f.name);
+  if (p.length) f.photos = p.map(r => ({ src: "data/사진/" + r["사진파일"], caption: r["설명"], credit: r["출처·허락"] }));
+  const a = access[f.name];
+  if (a) f.access = { "휠체어 출입": a["휠체어 출입"], "엘리베이터": a["엘리베이터"], "주차": a["주차"], "장애인 화장실": a["장애인 화장실"], "출처": a["출처"] };
+});
+
 // 지도 좌표: coords.json (주소 → [위도, 경도]), 카카오 주소 검색으로 만든 파일입니다.
 const coords = JSON.parse(fs.readFileSync(path.join(__dirname, "coords.json"), "utf8"));
 facilities.forEach(f => { if (coords[f.address]) [f.lat, f.lng] = coords[f.address]; });
 
+// 같은 기관 합치기: 이름이 같고 300m 안(좌표가 없으면 전화번호가 같으면)이면 한 카드로 모읍니다.
+// 예) 경로당이면서 무더위쉼터인 곳, 재가시설·장기요양기관으로 따로 등록된 곳
+const km = (a, b) => { const r = Math.PI / 180, x = (b.lng - a.lng) * r * Math.cos((a.lat + b.lat) * r / 2), y = (b.lat - a.lat) * r; return Math.hypot(x, y) * 6371; };
+// 이름은 옛 구 이름(동구·중구·제물포구·인천)을 빼고 비교합니다. 예) 쉼터 목록의 '동구노인복지관' = '제물포노인복지관'
+const core = n => n.replace(/\s/g, "").replace(/^(인천)?(동구|중구|제물포구?)/, "");
+const same = (a, b) => core(a.name) === core(b.name) &&
+  (a.lat && b.lat ? km(a, b) < 0.3 : !!a.phone && a.phone === b.phone);
+const isShelter = f => f.categories.every(c => c === "대피소" || c === "쉼터");
+const rank = f => (isShelter(f) ? 2 : 0) + (/(로|길)\s?\d/.test(f.address) ? 0 : 1); // 복지시설·도로명주소를 대표로
+const uniq = (list, sep) => [...new Set(list.filter(Boolean).flatMap(s => s.split(sep)).map(s => s.trim()))].join(sep);
+const merged = [];
+for (const f of facilities) {
+  const g = merged.find(m => m.some(x => same(x, f)));
+  g ? g.push(f) : merged.push([f]);
+}
+facilities.length = 0;
+for (const g of merged) {
+  g.sort((a, b) => rank(a) - rank(b));
+  const f = { ...g[0] };
+  if (g.length > 1) {
+    f.categories = [...new Set(g.flatMap(x => x.categories))];
+    f.type = uniq(g.map(x => x.type), "·");
+    f.service = uniq(g.map(x => x.service), ", ");
+    for (const k of ["hours", "homepage", "operatorType", "corp", "phone", "lat", "lng"]) f[k] ??= g.find(x => x[k])?.[k];
+  }
+  facilities.push(f);
+}
+
 const tabs = ["어르신", "장애인", "여성/아동", "한부모/다문화", "복지관/자활", "건강/재활", "대피소", "쉼터"];
-console.assert(facilities.every(f => f.name && (f.address || f.private) &&f.categories.every(c => tabs.includes(c))), "이름·주소가 비었거나 분야 이름이 틀린 기관이 있습니다");
+console.assert(facilities.every(f => f.name && (f.address || f.private) && f.categories.every(c => tabs.includes(c))), "이름·주소가 비었거나 분야 이름이 틀린 기관이 있습니다");
 fs.writeFileSync(path.join(__dirname, "..", "facilities.js"),
   "// data/make-data.js 로 자동 생성된 파일입니다. 직접 고치지 말고 CSV를 고친 뒤 다시 만드세요.\nconst facilities = " +
   JSON.stringify(facilities, null, 1) + ";\n");
+
 const noGuide = facilities.filter(f => !f.target).map(f => f.name + "(" + f.type + ")");
 if (noGuide.length) console.log("대상·하는 일 안내 없음: " + noGuide.join(", ") + " → 시설종류안내.js에 줄을 추가하세요");
 const ownMissing = Object.keys(own).filter(n => !facilities.some(f => f.name === n));

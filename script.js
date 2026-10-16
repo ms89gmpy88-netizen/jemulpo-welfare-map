@@ -3,7 +3,11 @@
 if (location.hostname === "127.0.0.1") location.replace(location.href.replace("127.0.0.1", "localhost"));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
-let map, clusterer, info, current = [], category = "전체";
+let map, clusterer, info, current = [], category = "전체", me = null, meMarker = null;
+
+// 두 지점 사이 거리(km)
+const km = (a, b) => { const r = Math.PI / 180, x = (b.lng - a.lng) * r * Math.cos((a.lat + b.lat) * r / 2), y = (b.lat - a.lat) * r; return Math.hypot(x, y) * 6371; };
+const distText = d => d < 1 ? Math.round(d * 1000 / 10) * 10 + "m" : d.toFixed(1) + "km";
 
 // 분야별 지도 표시 색. 메뉴 버튼의 색 점도 같은 색이라 메뉴가 곧 범례입니다.
 const colors = {
@@ -29,12 +33,14 @@ function show() {
   current = facilities.filter(f =>
     (category === "전체" || f.categories.includes(category)) &&
     (!q || squash(f.name + f.address + f.type + f.target + f.service).includes(q)));
+  // 내 주변 순: 위치가 있는 기관을 가까운 순으로, 위치를 모르는 기관은 맨 뒤로
+  if (me) current = current.map(f => ({ f, d: f.lat ? km(me, f) : Infinity })).sort((a, b) => a.d - b.d).map(({ f, d }) => (f.dist = d, f));
   document.getElementById("count").textContent = current.length + "곳";
   document.getElementById("cards").innerHTML = current.length
     ? current.map((f, i) => `
       <article class="card${f.lat ? " has-pin" : ""}" data-i="${i}">
         ${f.categories.map(c => `<span class="tag">${esc(c)}</span>`).join("")}<span class="tag">${esc(f.type)}</span>${f.check ? '<span class="tag check">확인 필요</span>' : ""}
-        <h3><button class="name-btn" type="button" title="상세정보 보기">${esc(f.name)}</button></h3>
+        <h3><button class="name-btn" type="button" title="상세정보 보기">${esc(f.name)}</button>${me && f.dist < Infinity ? `<span class="dist">${distText(f.dist)}</span>` : ""}</h3>
         ${f.target ? `<p class="who"><b>대상</b> ${esc(f.target)}</p>` : ""}
         ${f.service ? `<p class="who"><b>하는 일</b> ${esc(f.service)}</p>` : ""}
         ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소와 전화번호를 공개하지 않습니다.</p>" : `
@@ -53,7 +59,7 @@ function drawMarkers() {
   clusterer.clear();
   clusterer.addMarkers(current.filter(f => f.lat).map(f => {
     f.marker = new kakao.maps.Marker({ position: new kakao.maps.LatLng(f.lat, f.lng), title: f.name, image: pinImage(colorOf(f)) });
-    kakao.maps.event.addListener(f.marker, "click", () => openInfo(f));
+    kakao.maps.event.addListener(f.marker, "click", () => openDetail(f)); // 지도 표시를 누르면 바로 상세정보
     return f.marker;
   }));
 }
@@ -83,15 +89,16 @@ const dialog = document.getElementById("detail");
 const row = (label, value) => `<tr><th>${label}</th><td>${value || '<span class="none">정보 없음</span>'}</td></tr>`;
 
 function openDetail(f) {
-  const shelter = f.categories.some(c => c === "대피소" || c === "쉼터");
+  const shelter = f.categories.every(c => c === "대피소" || c === "쉼터"); // 복지시설이면서 쉼터인 곳은 복지시설로 봅니다
   document.getElementById("detail-body").innerHTML = `
     <p class="tags">${f.categories.map(c => `<span class="tag">${esc(c)}</span>`).join("")}</p>
     <h2 id="detail-name">${esc(f.name)}</h2>
-    ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소·전화·사진을 공개하지 않습니다.</p>" : `
+    ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소·전화·사진을 공개하지 않습니다.</p>" : shelter ? "" : `
     <h3>사진</h3>
-    <div id="roadview" class="roadview"><p>${f.lat ? "거리 사진을 불러오는 중입니다…" : "주소 위치를 찾지 못해 거리 사진을 보여 드릴 수 없습니다."}</p></div>
-    <p class="note">바깥 모습: 카카오 로드뷰 거리 사진입니다. 촬영 시기에 따라 지금 모습과 다를 수 있습니다.<br>
-      내부 사진: 기관이 공개한 사진 자료가 없어 싣지 않았습니다.${f.homepage ? " 홈페이지에서 확인해 보세요." : ""}</p>`}
+    ${f.photos ? `<div class="photos">${f.photos.map(p => `<figure><img src="${esc(p.src)}" alt="${esc(f.name + " " + (p.caption || "사진"))}" loading="lazy"><figcaption>${esc(p.caption || "")} <small>출처: ${esc(p.credit)}</small></figcaption></figure>`).join("")}</div>`
+      : `<div class="no-photo"><p>아직 기관이 사용을 허락한 사진이 없습니다.</p>
+        ${f.homepage ? `<a class="pin-btn" href="${esc(f.homepage)}" target="_blank" rel="noopener">기관 홈페이지에서 사진 보기</a>` : "<p>기관에 전화로 문의해 보세요.</p>"}</div>`}`}
+    ${f.how ? `<h3>이용 방법</h3><p class="how">${esc(f.how)}</p>` : ""}
     <table class="info-table">
       ${f.private ? "" : row("주소", esc(f.address))}
       ${f.private ? "" : row("연락처", f.phone && `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>`)}
@@ -103,31 +110,18 @@ function openDetail(f) {
       ${f.service ? row("하는 일", esc(f.service)) : ""}
       ${f.hours ? row("운영", esc(f.hours)) : ""}
     </table>
+    ${f.private ? "" : `<h3>이용 편의</h3>
+    <table class="info-table">
+      ${["휠체어 출입", "엘리베이터", "주차", "장애인 화장실"].map(k => row(k, esc(f.access?.[k] || ""))).join("")}
+    </table>
+    <p class="note">${f.access?.["출처"] ? "출처: " + esc(f.access["출처"]) : "아직 확인된 이용 편의 정보가 없습니다. 방문 전에 전화로 확인하세요."}</p>`}
     ${f.lat ? `<p class="actions">
       <button class="pin-btn" type="button" id="detail-map">지도에서 보기</button>
       <a class="pin-btn" href="https://map.kakao.com/link/to/${encodeURIComponent(f.name)},${f.lat},${f.lng}" target="_blank" rel="noopener">길찾기 (카카오맵)</a>
     </p>` : ""}`;
-  dialog.showModal();
-  document.getElementById("detail-map")?.addEventListener("click", () => { dialog.close(); focusOnMap(f); });
-  if (f.lat && !f.private && window.kakao && kakao.maps.RoadviewClient) showRoadview(f);
-}
-
-// 기관 위치에서 가장 가까운 로드뷰(50m 안)를 보여 줍니다.
-function showRoadview(f) {
-  const box = document.getElementById("roadview");
-  const pos = new kakao.maps.LatLng(f.lat, f.lng);
-  new kakao.maps.RoadviewClient().getNearestPanoId(pos, 50, panoId => {
-    if (!panoId) { box.innerHTML = "<p>이 주변은 카카오 로드뷰 거리 사진이 없습니다.</p>"; return; }
-    box.innerHTML = "";
-    const rv = new kakao.maps.Roadview(box);
-    rv.setPanoId(panoId, pos);
-    // 건물 쪽을 바라보도록 방향을 맞춥니다.
-    kakao.maps.event.addListener(rv, "init", () => {
-      const p = rv.getPosition();
-      const pan = Math.atan2(f.lng - p.getLng(), f.lat - p.getLat()) * 180 / Math.PI;
-      rv.setViewpoint({ pan: (pan + 360) % 360, tilt: 0, zoom: 0 });
-    });
-  });
+  if (!dialog.open) dialog.showModal();
+  dialog.scrollTop = 0;
+  document.getElementById("detail-map")?.addEventListener("click", () => { dialog.close(); if (map) focusOnMap(f); });
 }
 
 dialog.querySelector(".close").addEventListener("click", () => dialog.close());
@@ -146,6 +140,59 @@ document.querySelectorAll(".menu button").forEach(button => {
 });
 
 document.getElementById("search").addEventListener("input", show);
+
+// 내 주변 가까운 순: 휴대폰·컴퓨터의 위치를 받아 가까운 순으로 정렬합니다 (위치는 저장하거나 보내지 않습니다).
+const nearBtn = document.getElementById("near"), nearMsg = document.getElementById("near-msg");
+const say = text => { nearMsg.textContent = text; nearMsg.hidden = !text; };
+nearBtn.addEventListener("click", () => {
+  if (me) { // 다시 누르면 원래 순서로
+    me = null;
+    meMarker?.setMap(null);
+    nearBtn.textContent = "📍 내 주변 가까운 순";
+    nearBtn.setAttribute("aria-pressed", "false");
+    say("");
+    return show();
+  }
+  if (!navigator.geolocation) return say("이 브라우저는 위치 찾기를 지원하지 않습니다.");
+  say("내 위치를 찾는 중입니다… 위치 사용을 묻는 창이 뜨면 '허용'을 눌러 주세요.");
+  navigator.geolocation.getCurrentPosition(p => {
+    me = { lat: p.coords.latitude, lng: p.coords.longitude };
+    nearBtn.textContent = "↩ 원래 순서로";
+    nearBtn.setAttribute("aria-pressed", "true");
+    const far = facilities.every(f => !f.lat || km(me, f) > 10);
+    say(far ? "지금 위치가 제물포구에서 10km 넘게 떨어져 있어요. 가까운 순 정렬은 제물포구 안에서 쓰면 정확합니다." : "내 위치에서 가까운 순으로 보여 드립니다. 컴퓨터는 위치가 정확하지 않을 수 있습니다.");
+    if (map) {
+      const pos = new kakao.maps.LatLng(me.lat, me.lng);
+      meMarker?.setMap(null);
+      meMarker = new kakao.maps.CustomOverlay({ map, position: pos, content: '<div class="me-dot" title="내 위치"></div>', zIndex: 3 });
+      if (!far) { map.setLevel(4); map.panTo(pos); }
+    }
+    show();
+  }, () => say("위치를 가져오지 못했습니다. 브라우저 주소창 왼쪽의 자물쇠(또는 설정)에서 위치 권한을 '허용'으로 바꿔 주세요."),
+  { enableHighAccuracy: true, timeout: 10000 });
+});
+
+// 지도 접기/펴기
+const mapToggle = document.getElementById("map-toggle");
+mapToggle.addEventListener("click", () => {
+  const folded = document.body.classList.toggle("map-folded");
+  mapToggle.textContent = folded ? "🗺️ 지도 펴기" : "🗺️ 지도 접기";
+  mapToggle.setAttribute("aria-pressed", String(folded));
+  if (!folded && map) setTimeout(() => map.relayout(), 0); // 다시 보일 때 지도 크기 맞추기
+});
+
+// 글씨 크게 보기 (다음에 열어도 기억합니다)
+const bigBtn = document.getElementById("big-text");
+const setBig = on => {
+  document.documentElement.classList.toggle("big", on);
+  bigBtn.textContent = on ? "가 글씨 보통" : "가 글씨 크게";
+  bigBtn.setAttribute("aria-pressed", String(on));
+  try { localStorage.setItem("bigText", on ? "1" : "0"); } catch (e) {}
+  document.documentElement.style.setProperty("--menu-h", document.querySelector(".menu").offsetHeight + "px");
+  if (map) setTimeout(() => map.relayout(), 0);
+};
+bigBtn.addEventListener("click", () => setBig(!document.documentElement.classList.contains("big")));
+setBig(document.documentElement.classList.contains("big"));
 
 // 카카오 지도는 인터넷 연결과 등록된 주소(실행.bat)가 있어야 열립니다. 없으면 목록만 보여 줍니다.
 if (window.kakao && kakao.maps) {
