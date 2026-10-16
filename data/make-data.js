@@ -22,7 +22,7 @@ const facilities = [
   // 보호시설·공동생활가정은 '주소 비공개'로 이름만 싣습니다.
   ...parse("기타복지시설.csv").map(r => ({ name: r["시설명"], categories: r["분야"].split("|"), type: r["시설유형"], address: r["소재지"], phone: r["연락처"], check: r["확인상태"] === "확인 필요", private: r["확인상태"] === "주소 비공개" })),
   // 대피소·쉼터는 국민안전24 등에서 모은 자료입니다 (운영시간 칸이 있음).
-  ...parse("대피소쉼터.csv").map(r => ({ name: r["시설명"], categories: r["분야"].split("|"), type: r["시설유형"], address: r["소재지"], phone: r["연락처"], hours: r["운영시간"] })),
+  ...parse("대피소쉼터.csv").map(r => ({ name: r["시설명"], categories: r["분야"].split("|"), type: r["시설유형"], address: r["소재지"], phone: r["연락처"], hours: r["운영시간"], phoneLabel: r["문의처"] || undefined })),
 ].map(f => ({ ...f, categories: [...new Set([...f.categories, ...extra(f)])] }));
 
 // 대상·하는 일: 시설 종류별 일반 안내 + 기관별로 확인한 사업(기관별사업.csv)
@@ -94,7 +94,10 @@ for (const g of merged) {
     f.categories = [...new Set(g.flatMap(x => x.categories))];
     f.type = uniq(g.map(x => x.type), "·");
     f.service = uniq(g.map(x => x.service), ", ");
-    for (const k of ["hours", "homepage", "operatorType", "corp", "phone", "lat", "lng"]) f[k] ??= g.find(x => x[k])?.[k];
+    for (const k of ["hours", "homepage", "operatorType", "corp", "lat", "lng"]) f[k] ??= g.find(x => x[k])?.[k];
+    // 전화: 기관 자체 번호를 먼저 쓰고, 없을 때만 쉼터 자료의 구청 담당 부서 번호(문의처)를 씁니다.
+    const tel = g.find(x => x.phone && !x.phoneLabel) || g.find(x => x.phone);
+    f.phone = tel?.phone; f.phoneLabel = tel?.phoneLabel;
   }
   facilities.push(f);
 }

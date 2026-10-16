@@ -57,7 +57,7 @@ function show() {
         ${f.service ? `<p class="who"><b>하는 일</b> ${esc(f.service)}</p>` : ""}
         ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소와 전화번호를 공개하지 않습니다.</p>" : `
         <p><span class="k">주소</span>${esc(f.address)}</p>
-        <p><span class="k">전화</span>${f.phone ? `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>` : "정보 없음"}</p>
+        <p><span class="k">${f.phoneLabel ? "문의" : "전화"}</span>${f.phone ? `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>${f.phoneLabel ? ` <span class="by">${esc(f.phoneLabel)}</span>` : ""}` : "정보 없음"}</p>
         ${f.hours ? `<p><span class="k">운영</span>${esc(hoursText(f.hours))}</p>` : ""}
         ${f.lat ? `<button class="pin-btn" type="button">${icon("pin")}지도에서 보기</button>` : ""}`}
       </article>`).join("")
@@ -127,7 +127,7 @@ function openDetail(f) {
     <h2 id="detail-name">${esc(f.name)}</h2>
     ${f.private ? "<p>이용하는 분들의 안전과 생활 보호를 위해 주소·전화를 공개하지 않습니다.</p>" : `
     <div class="quick">
-      ${f.phone ? `<a class="main" href="tel:${esc(f.phone)}">${icon("phone")}전화</a>` : ""}
+      ${f.phone ? `<a class="main" href="tel:${esc(f.phone)}">${icon("phone")}${f.phoneLabel ? "문의 전화" : "전화"}</a>` : ""}
       ${f.lat ? `<a${f.phone ? "" : ' class="main"'} href="https://map.kakao.com/link/to/${encodeURIComponent(f.name)},${f.lat},${f.lng}" target="_blank" rel="noopener">${icon("route")}길찾기</a>` : ""}
       <button type="button" id="detail-share">${icon("share")}공유</button>
     </div>
@@ -140,7 +140,7 @@ function openDetail(f) {
     ${f.how ? `<h3>이용 방법</h3><p class="how">${esc(f.how)}</p>` : ""}
     <table class="info-table">
       ${f.private ? "" : row("주소", esc(f.address))}
-      ${f.private ? "" : row("연락처", f.phone && `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>`)}
+      ${f.private ? "" : row(f.phoneLabel ? "문의" : "연락처", f.phone && `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>${f.phoneLabel ? `<br><span class="by">${esc(f.phoneLabel)} (제물포구 담당 부서. 시설 직통 번호가 아닙니다)</span>` : ""}`)}
       ${f.private ? "" : row("홈페이지", f.homepage && `<a href="${esc(f.homepage)}" target="_blank" rel="noopener">${esc(f.homepage.replace(/^https?:\/\//, "").replace(/\/$/, ""))}</a>`)}
       ${shelter ? "" : row("운영주체 구분", esc(f.operatorType || ""))}
       ${row("시설 종류", esc(f.type))}
@@ -169,7 +169,7 @@ function openDetail(f) {
 async function share(f) {
   const msg = document.getElementById("share-msg");
   const url = location.origin + location.pathname + "#" + encodeURIComponent(f.name);
-  const text = [f.name, f.address, f.phone && "전화 " + f.phone].filter(Boolean).join("\n");
+  const text = [f.name, f.address, f.phone && (f.phoneLabel ? `문의 ${f.phone} (${f.phoneLabel})` : "전화 " + f.phone)].filter(Boolean).join("\n");
   const tell = t => { msg.textContent = t; msg.hidden = false; };
   try {
     if (navigator.share) await navigator.share({ title: f.name, text, url });

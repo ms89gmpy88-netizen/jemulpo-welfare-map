@@ -216,6 +216,7 @@ button { font: inherit; color: inherit; }
   color: var(--ink);
   margin-right: 0.25rem;
 }
+.by { font-size: 0.85em; color: var(--muted); }
 .dist { flex: none; font-size: 0.9rem; font-weight: 800; color: var(--accent); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 /* 기관 이름 버튼 (누르면 상세정보) */
