@@ -23,6 +23,8 @@ const facilities = [
   ...parse("기타복지시설.csv").map(r => ({ name: r["시설명"], categories: r["분야"].split("|"), type: r["시설유형"], address: r["소재지"], phone: r["연락처"], check: r["확인상태"] === "확인 필요", private: r["확인상태"] === "주소 비공개" })),
   // 대피소·쉼터는 국민안전24 등에서 모은 자료입니다 (운영시간 칸이 있음).
   ...parse("대피소쉼터.csv").map(r => ({ name: r["시설명"], categories: r["분야"].split("|"), type: r["시설유형"], address: r["소재지"], phone: r["연락처"], hours: r["운영시간"], phoneLabel: r["문의처"] || undefined })),
+  // 안전·보건(경찰·해양경찰·소방): 공식 홈페이지 + 카카오맵·네이버 플레이스로 확인한 곳
+  ...parse("안전보건.csv").map(r => ({ name: r["시설명"], categories: [r["분야"]], type: r["시설유형"], address: r["소재지"], phone: r["연락처"] })),
 ].map(f => ({ ...f, categories: [...new Set([...f.categories, ...extra(f)])] }));
 
 // 대상·하는 일: 시설 종류별 일반 안내 + 기관별로 확인한 사업(기관별사업.csv)
