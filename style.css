@@ -134,7 +134,7 @@ button { font: inherit; color: inherit; }
 .subitem:hover { background: var(--bg); }
 .subitem input { width: 1.15rem; height: 1.15rem; margin: 0; accent-color: var(--accent); cursor: pointer; }
 .subitem .dot { flex: none; width: 0.65rem; height: 0.65rem; border-radius: 50%; background: var(--dot); }
-.sub-name { flex: 1; }
+.sub-name { flex: 1; min-width: 0; overflow-wrap: normal; }
 .sub-n { color: var(--muted); font-size: 0.85rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .empty-sub { color: #8a918d; cursor: default; }
 .empty-sub:hover { background: none; }
@@ -234,7 +234,7 @@ button { font: inherit; color: inherit; }
 /* 컴퓨터: 네 칸 */
 @media (min-width: 900px) {
   body { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
-  .app { flex: 1; min-height: 0; display: grid; grid-template-columns: 5.5rem 14rem minmax(0, 1fr) 24rem; }
+  .app { flex: 1; min-height: 0; display: grid; grid-template-columns: 5.5rem 15.5rem minmax(0, 1fr) 24rem; }
   .rail { align-content: start; border-right: 1px solid var(--line); }
   .filters { overflow-y: auto; padding: 1rem 0.6rem; border-right: 1px solid var(--line); }
   .filters h2 { padding: 0 0.6rem; }
@@ -245,7 +245,7 @@ button { font: inherit; color: inherit; }
   .search-box { order: 0; }
 }
 @media (min-width: 900px) and (max-width: 1199px) {
-  .app { grid-template-columns: 5rem 12rem minmax(0, 1fr) 20rem; }
+  .app { grid-template-columns: 5rem 14.5rem minmax(0, 1fr) 20rem; }
 }
 
 /* 휴대폰·좁은 화면 */
@@ -366,3 +366,59 @@ button { font: inherit; color: inherit; }
 .way-map { width: 100%; height: 180px; border-radius: var(--radius); overflow: hidden; margin-bottom: 0.6rem; border: 1px solid var(--line); }
 .way-list { margin: 0; padding-left: 1.2rem; line-height: 1.7; font-size: 0.95rem; }
 
+
+/* 복지시설 소분야: 세부 항목 아래로 펼치는 체크박스 */
+.tree-head { display: flex; align-items: center; gap: 0.15rem; }
+.tree-head .subitem { flex: 1; min-width: 0; }
+.expand {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.expand:hover { background: var(--bg); color: var(--ink); }
+.expand .ic { transform: rotate(90deg); transition: transform 0.18s var(--ease); }
+.expand[aria-expanded="true"] .ic { transform: rotate(-90deg); }
+.minors { padding: 0 0 0.35rem 1.45rem; }
+.minor { min-height: 40px; font-size: 0.92rem; font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .expand .ic { transition: none; } }
+
+/* 관광명소 사진 (위키미디어 공용) */
+.pics { display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: 0.5rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin: 0 0 1rem; }
+.pics::-webkit-scrollbar { display: none; }
+.pics:has(figure + figure) { grid-auto-columns: 88%; }
+.pics figure { margin: 0; scroll-snap-align: start; }
+.pics img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: var(--radius); background: var(--surface-2); }
+.pics figcaption { margin-top: 0.3rem; font-size: 0.78rem; color: var(--muted); line-height: 1.45; }
+.dbody .photo-links { margin: 0 0 0.25rem; }
+.dbody .photo-note { margin: 0 0 1rem; }
+
+/* 맛집·카페 메뉴 (운영 시간 아래) */
+.summary .hours.first { margin: 0; padding: 0; border: 0; }
+.summary .menu-title { margin: 0.6rem 0 0.2rem; padding-top: 0.6rem; border-top: 1px solid var(--line); }
+.summary .menu { list-style: none; padding: 0; }
+.summary .menu li { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; padding: 0.3rem 0; border-bottom: 1px dashed var(--line); }
+.summary .menu li:last-child { border-bottom: 0; }
+.summary .menu .price { flex: none; font-weight: 700; font-variant-numeric: tabular-nums; }
+.summary .best { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 0 0.4rem; border-radius: 999px; background: var(--accent); color: #fff; vertical-align: 0.1em; }
+.summary .menu-note { margin: 0.35rem 0 0; font-size: 0.82rem; color: var(--muted); }
+.info-table.short { margin-top: 0.25rem; }
+.summary + .info-table { margin-top: 0.5rem; }
+
+/* 휴대폰: 복지시설은 세부 항목을 한 줄씩, 펼친 소분야는 칩으로 */
+@media (max-width: 899px) {
+  .subs.tree { display: block; overflow: visible; }
+  .subs.tree .tree-item + .tree-item { border-top: 1px solid var(--line); }
+  .subs.tree .tree-head .subitem,
+  .subs.tree .tree-head .subitem:has(input:checked) { border: 0; border-radius: 10px; background: none; padding: 0.3rem 0.4rem; }
+  .subs.tree .minors { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 0 0.6rem 1.6rem; }
+  .subs.tree .minors[hidden] { display: none; }
+  .subs.tree .minor { min-height: 40px; }
+}

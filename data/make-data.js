@@ -115,6 +115,38 @@ facilities.forEach(f => { if (hours[f.name]) f.hours = hours[f.name]; });
 const hoursMissing = Object.keys(hours).filter(n => !facilities.some(f => f.name === n));
 if (hoursMissing.length) console.log("운영시간.csv에만 있고 목록에 없는 이름: " + hoursMissing.join(", "));
 
+// 맛집·카페·관광명소: 네이버 플레이스의 메뉴(대표 메뉴 먼저 8개까지)와 편의 정보
+const place = Object.fromEntries(parse("핫플레이스상세.csv").map(r => [r["시설명"], r]));
+facilities.forEach(f => {
+  const p = place[f.name];
+  if (!p) return;
+  f.naver = p["네이버플레이스ID"];
+  if (p["편의"]) f.conv = p["편의"];
+  if (p["휠체어출입"]) f.wheel = p["휠체어출입"];
+  if (p["메뉴"]) [f.menu, f.menuDate] = [p["메뉴"].split(" | "), p["메뉴확인일"]];
+});
+const placeMissing = Object.keys(place).filter(n => !facilities.some(f => f.name === n));
+if (placeMissing.length) console.log("핫플레이스상세.csv에만 있고 목록에 없는 이름: " + placeMissing.join(", "));
+
+// 관광명소 사진: 위키미디어 공용의 자유 이용 사진(찍은 사람·이용허락을 함께 표시)
+const pics = parse("관광명소사진.csv");
+facilities.forEach(f => {
+  const p = pics.filter(r => r["시설명"] === f.name);
+  if (p.length) f.pics = p.map(r => ({ src: r["사진주소"], page: r["원본페이지"], by: r["찍은사람"], license: r["이용허락"] }));
+});
+const picsMissing = pics.map(r => r["시설명"]).filter(n => !facilities.some(f => f.name === n));
+if (picsMissing.length) console.log("관광명소사진.csv에만 있고 목록에 없는 이름: " + picsMissing.join(", "));
+
+// 오시는 길: 가까운 버스 정류장 (OpenStreetMap 자료, 500m 안, 이름이 다른 곳 2개까지. 길 건너 같은 이름 정류장은 하나로)
+const stops = parse("버스정류장.csv").map(r => ({ name: r["정류장명"], ref: r["정류장번호"], lat: +r["위도"], lng: +r["경도"] }));
+facilities.forEach(f => {
+  if (!f.lat) return;
+  const near = [];
+  for (const s of stops.map(s => ({ s, d: km(f, s) })).filter(x => x.d <= 0.5).sort((a, b) => a.d - b.d))
+    if (!near.some(n => n[0] === s.s.name) && near.length < 2) near.push([s.s.name, Math.round(s.d * 1000)]);
+  if (near.length) f.bus = near;
+});
+
 // 화면의 세부 항목(체크박스)으로 나눕니다. 대피소·쉼터는 시설유형 글자로 나눕니다.
 // 예) '경로당·무더위쉼터·한파쉼터' → 어르신 + 무더위쉼터 + 한파쉼터
 const shelterSubs = [[/지진옥외/, "지진옥외 대피소"], [/화학사고/, "화학사고 대피소"], [/민방위/, "민방위 대피소"], [/임시주거/, "임시주거시설"], [/한파쉼터/, "한파쉼터"], [/무더위쉼터/, "무더위쉼터"]];

@@ -12,6 +12,9 @@ const icons = {
   locate: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
   back: '<path d="m15 6-6 6 6 6"/>',
   map: '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>',
+  bus: '<rect x="5" y="3" width="14" height="15" rx="2.5"/><path d="M5 11h14M8 18v2.5M16 18v2.5"/><circle cx="8.5" cy="14.5" r=".6"/><circle cx="15.5" cy="14.5" r=".6"/>',
+  photo: '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-9 8"/>',
+  menu: '<path d="M6 3h12v18H6z"/><path d="M9 8h6M9 12h6M9 16h4"/>',
 };
 const icon = name => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${icons[name]}</svg>`;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -40,16 +43,36 @@ const colors = {
   "경찰서": "#1b3a8c", "해양경찰서": "#0b7285", "소방서": "#e03131",
   "관광명소": "#7048e8", "맛집": "#e8590c", "분위기 좋은 카페": "#8c5a2b",
 };
+// 복지시설의 소분야: 세부 항목 안에서 시설 종류로 한 번 더 나눕니다. [소분야 이름, 시설 종류 글자] — 위에서부터 먼저 맞는 것
+const MINORS = {
+  "어르신": [["노인복지관", /노인여가복지/], ["경로당", /경로당/], ["재가·주야간보호", /재가/], ["요양원", /노인요양시설/], ["일자리·치매 지원", /노인일자리|치매/]],
+  "장애인": [["장애인복지관·재활", /지역사회재활/], ["직업재활", /직업재활/], ["거주시설", /거주|공동생활/]],
+  "여성/아동": [["어린이집", /어린이집/], ["지역아동센터·돌봄", /지역아동센터|다함께돌봄/], ["육아·청소년", /장난감|청소년/], ["아동 보호", /아동보호|아동양육/], ["폭력 피해 상담·보호", /폭력/]],
+  "한부모/다문화": [["가족센터", /가족센터/], ["자활센터", /자활/], ["푸드마켓", /푸드마켓|기부식품/]],
+  "복지관/자활": [["종합사회복지관", /종합사회복지관/], ["노인복지관", /노인여가복지/], ["장애인복지관", /장애인/], ["자활센터", /자활/]],
+  "건강/재활": [["보건소·건강센터", /보건소|건강생활/], ["치매안심센터", /치매/], ["정신건강·중독", /정신|중독/], ["장애인 재활", /장애인/], ["재가·주야간보호", /재가/]],
+};
+const minorOf = (f, c) => (MINORS[c].find(([, re]) => re.test(f.type)) || ["그 밖의 시설"])[0];
+// 세부 항목 안의 소분야 목록 (자료가 있는 것만, 정해 둔 순서대로)
+const minorsIn = c => {
+  const have = new Set(facilities.filter(f => f.categories.includes(c)).map(f => minorOf(f, c)));
+  return [...MINORS[c].map(([m]) => m), "그 밖의 시설"].filter((m, i, a) => have.has(m) && a.indexOf(m) === i);
+};
 const pins = {};
 const pinImage = color => pins[color] ||= new kakao.maps.MarkerImage(
   "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38"><path d="M14 1C7 1 1.5 6.4 1.5 13.3 1.5 22.5 14 37 14 37s12.5-14.5 12.5-23.7C26.5 6.4 21 1 14 1z" fill="${color}" stroke="#fff" stroke-width="2"/><circle cx="14" cy="13.5" r="4.5" fill="#fff"/></svg>`),
   new kakao.maps.Size(28, 38), { offset: new kakao.maps.Point(14, 37) });
 
 let group = GROUPS[0];
-const checked = Object.fromEntries(GROUPS.map(g => [g.id, new Set(g.subs)])); // 처음에는 모든 항목을 켭니다
+// 켜 둔 항목. 복지시설은 '어르신|경로당'처럼 소분야까지 적습니다. 처음에는 모두 켭니다.
+const keysOf = g => g.id === "welfare" ? g.subs.flatMap(c => minorsIn(c).map(m => c + "|" + m)) : g.subs;
+const checked = Object.fromEntries(GROUPS.map(g => [g.id, new Set(keysOf(g))]));
 const groupOf = sub => GROUPS.find(g => g.subs.includes(sub));
+// 그 기관이 지금 켜 둔 항목에 들어가면 그 세부 항목 이름을, 아니면 undefined
+const shownAs = f => f.categories.find(c => checked[group.id].has(group.id === "welfare" && MINORS[c] ? c + "|" + minorOf(f, c) : c));
 // 지도 표시 색: 지금 켜 둔 항목 가운데 그 기관이 속한 첫 항목의 색
-const colorOf = f => colors[f.categories.find(c => checked[group.id].has(c)) || f.categories[0]];
+const colorOf = f => colors[shownAs(f) || f.categories[0]];
+const opened = new Set(); // 소분야를 펼쳐 둔 세부 항목
 const isWide = () => matchMedia("(min-width: 900px)").matches;
 
 // 띄어쓰기를 빼고 비교해서 '송림 동'처럼 입력해도 찾을 수 있게 합니다.
@@ -62,10 +85,23 @@ function drawRail() {
 }
 function drawSubs() {
   document.getElementById("group-name").textContent = group.name;
-  document.getElementById("subs").innerHTML = group.subs.map(s => {
+  const subs = document.getElementById("subs"), set = checked[group.id];
+  const tree = group.id === "welfare";
+  subs.classList.toggle("tree", tree);
+  subs.innerHTML = group.subs.map(s => {
     const n = facilities.filter(f => f.categories.includes(s)).length;
-    return `<label class="subitem${n ? "" : " empty-sub"}" style="--dot:${colors[s]}"><input type="checkbox" value="${esc(s)}"${checked[group.id].has(s) ? " checked" : ""}${n ? "" : " disabled"}><span class="dot"></span><span class="sub-name">${esc(s)}</span><span class="sub-n">${n}</span></label>`;
+    if (!tree) return `<label class="subitem${n ? "" : " empty-sub"}" style="--dot:${colors[s]}"><input type="checkbox" value="${esc(s)}"${set.has(s) ? " checked" : ""}${n ? "" : " disabled"}><span class="dot"></span><span class="sub-name">${esc(s)}</span><span class="sub-n">${n}</span></label>`;
+    // 복지시설: 세부 항목(전체 켜기/끄기) 아래에 소분야 체크박스
+    const ms = minorsIn(s), on = ms.filter(m => set.has(s + "|" + m)).length, open = opened.has(s);
+    return `<div class="tree-item">
+      <div class="tree-head">
+        <label class="subitem" style="--dot:${colors[s]}"><input type="checkbox" data-cat="${esc(s)}"${on === ms.length ? " checked" : ""}${on && on < ms.length ? ' data-mixed="1"' : ""}><span class="dot"></span><span class="sub-name">${esc(s)}</span><span class="sub-n">${n}</span></label>
+        <button type="button" class="expand" data-open="${esc(s)}" aria-expanded="${open}" aria-label="${esc(s)} 소분야 ${open ? "접기" : "펼치기"}">${icon("chevron")}</button>
+      </div>
+      <div class="minors"${open ? "" : " hidden"}>${ms.map(m => `<label class="subitem minor"><input type="checkbox" value="${esc(s + "|" + m)}"${set.has(s + "|" + m) ? " checked" : ""}><span class="sub-name">${esc(m)}</span><span class="sub-n">${facilities.filter(f => f.categories.includes(s) && minorOf(f, s) === m).length}</span></label>`).join("")}</div>
+    </div>`;
   }).join("");
+  subs.querySelectorAll("[data-mixed]").forEach(i => { i.indeterminate = true; }); // 일부만 켜졌을 때 '−' 표시
   const none = group.subs.every(s => !facilities.some(f => f.categories.includes(s)));
   const note = document.getElementById("filters-note");
   note.hidden = !none;
@@ -76,8 +112,8 @@ function show() {
   const q = squash(searchBox.value);
   // 검색할 때는 분야와 상관없이 전체에서 찾습니다.
   current = q
-    ? facilities.filter(f => squash(f.name + f.address + f.type + f.target + f.service).includes(q))
-    : facilities.filter(f => f.categories.some(c => checked[group.id].has(c)));
+    ? facilities.filter(f => squash(f.name + f.address + f.type + f.target + f.service + (f.menu || []).join("")).includes(q))
+    : facilities.filter(shownAs);
   // 내 주변 순: 위치가 있는 기관을 가까운 순으로, 위치를 모르는 기관은 맨 뒤로
   if (me) current = current.map(f => ({ f, d: f.lat ? km(me, f) : Infinity })).sort((a, b) => a.d - b.d).map(({ f, d }) => (f.dist = d, f));
   document.getElementById("list-title").firstChild.textContent = q ? `'${searchBox.value.trim()}' 검색 결과 ` : group.name + " ";
@@ -138,10 +174,25 @@ document.getElementById("rail").addEventListener("click", e => {
 });
 // 세부 항목 켜고 끄기
 document.getElementById("subs").addEventListener("change", e => {
-  const set = checked[group.id];
-  e.target.checked ? set.add(e.target.value) : set.delete(e.target.value);
+  const set = checked[group.id], cat = e.target.dataset.cat;
+  // 복지시설 세부 항목을 누르면 그 안의 소분야를 한꺼번에 켜고 끕니다.
+  const keys = cat ? minorsIn(cat).map(m => cat + "|" + m) : [e.target.value];
+  keys.forEach(k => e.target.checked ? set.add(k) : set.delete(k));
+  if (group.id === "welfare") { // 위아래 체크 표시를 맞추고, 누르던 칸에 그대로 머뭅니다
+    drawSubs();
+    e.currentTarget.querySelector(cat ? `[data-cat="${CSS.escape(cat)}"]` : `[value="${CSS.escape(keys[0])}"]`)?.focus();
+  }
   closeDetail();
   show();
+});
+// 소분야 펼치기·접기
+document.getElementById("subs").addEventListener("click", e => {
+  const b = e.target.closest(".expand");
+  if (!b) return;
+  const s = b.dataset.open;
+  opened.has(s) ? opened.delete(s) : opened.add(s);
+  drawSubs();
+  document.querySelector(`.expand[data-open="${CSS.escape(s)}"]`)?.focus();
 });
 
 // 운영 시간 읽기 쉽게 두 부분으로 나눕니다.
@@ -174,8 +225,48 @@ function closeDetail() {
   if (!detailView.hidden) { detailView.hidden = true; detailView.innerHTML = ""; listView.hidden = false; document.getElementById("list").scrollTop = listScroll; }
 }
 
+// 상세정보는 분야마다 보여 주는 항목이 다릅니다.
+//  복지시설·대피시설: 대상·하는 일·운영 시간·이용 방법·기관 정보·이용 편의·오시는 길
+//  안전·보건: 주소·연락처·오시는 길
+//  관광명소: 사진·운영 시간·주소·연락처·이용 편의·오시는 길
+//  맛집·카페: 사진 보기·운영 시간·메뉴·주소·연락처·이용 편의·오시는 길
+const kindOf = f => {
+  const ids = f.categories.map(c => groupOf(c)?.id);
+  if (ids.includes("welfare")) return "welfare"; // 복지시설이면서 쉼터인 곳은 복지시설로 봅니다
+  if (f.categories.includes("관광명소")) return "tour"; // 예) 자유공원 = 관광명소 + 지진옥외 대피소
+  if (ids.includes("hot")) return "food";
+  if (ids.includes("shelter")) return "shelter";
+  return "safety";
+};
+const hoursHtml = h => h ? (({ main, extra }) => esc(main) + (extra ? `<span class="sub">(${esc(extra)})</span>` : ""))(hoursParts(h))
+  : '<span class="none">아직 확인하지 못했습니다. 방문 전에 전화로 확인하세요.</span>';
+// "깐풍활전복 28,000원 (대표)" → 이름, 가격, 대표 여부
+const menuItem = s => { const m = s.match(/^(.*?)\s+([\d,]+원~?|변동|시가)( \(대표\))?$/); return m ? [m[1], m[2], !!m[3]] : [s, "", false]; };
+const naverPlace = (f, tab) => `https://m.place.naver.com/${f.categories.includes("관광명소") ? "place" : "restaurant"}/${f.naver}/${tab}`;
+
+// 이용 편의: 장애인편의시설 자료(이용편의.csv) + 네이버 플레이스 편의 정보(맛집·카페·관광명소)
+function accessHtml(f) {
+  const conv = (f.conv || "").split(",").map(s => s.trim()).filter(Boolean);
+  const a = f.access || {};
+  const rows = [
+    ["휠체어 출입", f.wheel ? "가능 (네이버 플레이스 표시)" : a["휠체어 출입"]],
+    ["엘리베이터", a["엘리베이터"]],
+    ["주차", conv.includes("발렛파킹") ? "가능 (발렛파킹)" : conv.includes("주차") ? "가능" : a["주차"]],
+    ["장애인 화장실", a["장애인 화장실"]],
+  ];
+  if (conv.includes("남/녀 화장실 구분")) rows.push(["화장실", "남녀 따로"]);
+  const rest = conv.filter(s => !["주차", "발렛파킹", "남/녀 화장실 구분"].includes(s));
+  if (rest.length) rows.push(["그 밖에", rest.join(", ")]);
+  const src = [a["출처"], (f.conv || f.wheel) && "네이버 플레이스 편의 정보(2026-10-17)"].filter(Boolean);
+  // 네이버 정보만 있으면 엘리베이터·장애인 화장실 줄은 빼서 '정보 없음'이 줄줄이 나오지 않게 합니다.
+  const shown = a["출처"] ? rows : rows.filter(([, v]) => v);
+  return `<h3>이용 편의</h3>
+    ${shown.length ? `<table class="info-table">${shown.map(([k, v]) => row(k, esc(v || ""))).join("")}</table>` : ""}
+    <p class="note">${src.length ? "출처: " + src.map(esc).join(", ") + "<br>'정보 없음'은 없다는 뜻이 아닐 수 있습니다. 방문 전에 전화로 확인하세요." : "아직 확인된 이용 편의 정보가 없습니다. 방문 전에 전화로 확인하세요."}</p>`;
+}
+
 function openDetail(f) {
-  const shelter = !f.categories.some(c => groupOf(c)?.id === "welfare"); // 복지시설이면서 쉼터인 곳은 복지시설로 봅니다
+  const kind = kindOf(f), hot = kind === "tour" || kind === "food";
   const wide = isWide();
   if (wide) { // 컴퓨터: 오른쪽 목록 자리에 보여 주고, 지도를 그 기관으로 옮깁니다
     if (dialog.open) dialog.close();
@@ -184,6 +275,16 @@ function openDetail(f) {
     if (map && f.marker) { map.panTo(f.marker.getPosition()); openInfo(f); }
   } else if (!detailView.hidden) { detailView.hidden = true; detailView.innerHTML = ""; listView.hidden = false; }
   const box = wide ? detailView : document.getElementById("detail-body");
+  const tel = f.phone && `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>${f.phoneLabel ? `<br><span class="by">${esc(f.phoneLabel)} (제물포구 담당 부서. 시설 직통 번호가 아닙니다)</span>` : ""}`;
+  // 사진: 관광명소는 자유 이용 사진(위키미디어 공용)을 바로 보여 주고, 가게 사진은 저작권 때문에 네이버 플레이스로 연결합니다.
+  const photos = kind === "tour" && f.pics ? `
+    <div class="pics">${f.pics.map(p => `<figure><img src="${esc(p.src)}" alt="${esc(f.name)} 사진" loading="lazy" referrerpolicy="no-referrer"><figcaption>사진: <a href="${esc(p.page)}" target="_blank" rel="noopener">${esc(p.by)}</a> · ${esc(p.license.replace("KOGL Type 1", "공공누리 제1유형"))} (위키미디어 공용)</figcaption></figure>`).join("")}</div>`
+    : hot && f.naver ? `
+    <p class="actions photo-links">
+      <a class="pin-btn" href="${naverPlace(f, "photo")}" target="_blank" rel="noopener">${icon("photo")}${kind === "food" ? "가게 사진 보기" : "사진 보기"}</a>
+      ${f.menu ? `<a class="pin-btn" href="${naverPlace(f, "menu/list")}" target="_blank" rel="noopener">${icon("menu")}메뉴판 사진 보기</a>` : ""}
+    </p>
+    <p class="note photo-note">사진은 저작권이 있어 네이버 플레이스에서 보여 드립니다.</p>` : "";
   box.innerHTML = (wide ? `<button class="back" type="button" id="detail-back">${icon("back")}목록으로</button>` : "") + `
     <p class="tags">${f.categories.map(c => `<span class="tag">${esc(c)}</span>`).join("")}</p>
     <h2 id="detail-name">${esc(f.name)}</h2>
@@ -194,31 +295,39 @@ function openDetail(f) {
       <button type="button" id="detail-share">${icon("share")}공유</button>
     </div>
     <p class="share-msg" id="share-msg" role="status" hidden></p>`}
+    ${photos}
+    ${kind === "safety" ? "" : hot ? `
+    <div class="summary">
+      <p class="hours first"><b>운영 시간</b><span>${!f.hours && /^(거리|공원|산책로)(·|$)/.test(f.type) ? "거리·공원이라 따로 정한 운영 시간이 없습니다.<span class=\"sub\">(안에 있는 가게·시설은 저마다 다릅니다)</span>" : hoursHtml(f.hours)}</span></p>
+      ${f.menu ? `<p class="menu-title"><b>메뉴</b></p>
+      <ul class="menu">${f.menu.map(menuItem).map(([n, p, best]) => `<li><span>${esc(n)}${best ? ' <span class="best">대표</span>' : ""}</span><span class="price">${esc(p)}</span></li>`).join("")}</ul>
+      <p class="menu-note">네이버 플레이스 메뉴${f.menuDate ? ` (${esc(f.menuDate.replace(/-/g, "."))} 기준)` : ""}. 가격은 바뀔 수 있습니다.</p>` : ""}
+    </div>` : `
     <div class="summary">
       ${f.target ? `<p><b>대상</b>${esc(f.target)}</p>` : ""}
       ${f.service ? `<p><b>하는 일</b></p><ul>${f.service.split(/,\s*(?![^()]*\))/).map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
-      <p class="hours"><b>운영 시간</b><span>${f.hours ? (({ main, extra }) => esc(main) + (extra ? `<span class="sub">(${esc(extra)})</span>` : ""))(hoursParts(f.hours)) : '<span class="none">아직 확인하지 못했습니다. 방문 전에 전화로 확인하세요.</span>'}</span></p>
+      <p class="hours"><b>운영 시간</b><span>${hoursHtml(f.hours)}</span></p>
     </div>
-    ${f.how ? `<h3>이용 방법</h3><p class="how">${esc(f.how)}</p>` : ""}
-    <table class="info-table">
-      ${f.private ? "" : row("주소", esc(f.address))}
-      ${f.private ? "" : row(f.phoneLabel ? "문의" : "연락처", f.phone && `<a href="tel:${esc(f.phone)}">${esc(f.phone)}</a>${f.phoneLabel ? `<br><span class="by">${esc(f.phoneLabel)} (제물포구 담당 부서. 시설 직통 번호가 아닙니다)</span>` : ""}`)}
-      ${f.private ? "" : row("홈페이지", f.homepage && `<a href="${esc(f.homepage)}" target="_blank" rel="noopener">${esc(f.homepage.replace(/^https?:\/\//, "").replace(/\/$/, ""))}</a>`)}
-      ${shelter ? "" : row("운영주체 구분", esc(f.operatorType || ""))}
-      ${row("시설 종류", esc(f.type))}
-      ${shelter ? "" : row("법인명", esc(f.corp || ""))}
-    </table>
-    ${f.hot ? `<p class="note">고른 기준: ${esc(f.hot)}. 제물포구청이 추천하는 곳이 아니며, 광고를 받지 않았습니다.</p>` : ""}
-    ${f.private ? "" : `<h3>이용 편의</h3>
-    <table class="info-table">
-      ${["휠체어 출입", "엘리베이터", "주차", "장애인 화장실"].map(k => row(k, esc(f.access?.[k] || ""))).join("")}
-    </table>
-    <p class="note">${f.access?.["출처"] ? "출처: " + esc(f.access["출처"]) + "<br>기관이 들어 있는 건물 기준이며, '자료에 없음'은 설치되지 않았다는 뜻이 아닐 수 있습니다. 방문 전에 전화로 확인하세요." : "아직 확인된 이용 편의 정보가 없습니다. 방문 전에 전화로 확인하세요."}</p>`}
+    ${f.how ? `<h3>이용 방법</h3><p class="how">${esc(f.how)}</p>` : ""}`}
+    ${f.private ? "" : `<table class="info-table${kind === "welfare" || kind === "shelter" ? "" : " short"}">
+      ${row("주소", esc(f.address))}
+      ${row(f.phoneLabel ? "문의" : "연락처", tel)}
+      ${kind === "welfare" || kind === "shelter" ? row("홈페이지", f.homepage && `<a href="${esc(f.homepage)}" target="_blank" rel="noopener">${esc(f.homepage.replace(/^https?:\/\//, "").replace(/\/$/, ""))}</a>`) : ""}
+      ${kind === "welfare" ? row("운영주체 구분", esc(f.operatorType || "")) : ""}
+      ${kind === "welfare" || kind === "shelter" ? row("시설 종류", esc(f.type)) : ""}
+      ${kind === "welfare" ? row("법인명", esc(f.corp || "")) : ""}
+    </table>`}
+    ${f.private || kind === "safety" ? "" : accessHtml(f)}
     ${f.lat ? `<h3>오시는 길</h3>
     <div class="way-map" id="way-map"></div>
-    <ul class="way-list"><li>${esc(f.address)}</li><li id="way-subway">가까운 지하철역 찾는 중…</li></ul>
-    <p class="note">지하철역 거리는 직선거리라 실제로 걷는 길은 더 멀 수 있습니다. 버스 노선은 카카오맵 길찾기에서 확인하세요.</p>
+    <ul class="way-list">
+      <li>${esc(f.address)}</li>
+      <li id="way-subway">가까운 지하철역 찾는 중…</li>
+      <li>${f.bus ? "가까운 버스 정류장: " + f.bus.map(([n, m]) => `${esc(n)} (약 ${m < 50 ? 50 : Math.round(m / 10) * 10}m, 걸어서 약 ${Math.max(1, Math.round(m / 67))}분)`).join(", ") : "걸어갈 만한 거리(500m)에 버스 정류장 자료가 없습니다."}</li>
+    </ul>
+    <p class="note">거리는 직선거리라 실제로 걷는 길은 더 멀 수 있습니다. 버스 정류장 위치는 OpenStreetMap 자료(© OpenStreetMap 기여자)입니다. 지나는 버스 번호와 갈아타는 길은 '대중교통 길찾기'에서 확인하세요.</p>
     <p class="actions">
+      <a class="pin-btn" id="detail-transit" href="https://map.kakao.com/link/to/${encodeURIComponent(f.name)},${f.lat},${f.lng}" target="_blank" rel="noopener">${icon("bus")}대중교통 길찾기</a>
       <button class="pin-btn" type="button" id="detail-map">${icon("pin")}지도에서 보기</button>
     </p>` : ""}`;
   if (wide) document.getElementById("list").scrollTop = 0;
@@ -226,6 +335,8 @@ function openDetail(f) {
   document.getElementById("detail-back")?.addEventListener("click", closeDetail);
   document.getElementById("detail-map")?.addEventListener("click", () => { if (dialog.open) dialog.close(); if (map) focusOnMap(f); });
   document.getElementById("detail-share")?.addEventListener("click", () => share(f));
+  // 사진을 못 불러오면 그 칸을 숨깁니다.
+  box.querySelectorAll(".pics img").forEach(img => img.addEventListener("error", () => img.closest("figure").remove()));
   if (f.lat) showWay(f);
 }
 
@@ -246,9 +357,19 @@ async function share(f) {
 // 오시는 길: 작은 지도와 가까운 지하철역(카카오 장소 검색, 1.5km 안 2곳)
 function showWay(f) {
   const subway = document.getElementById("way-subway");
-  if (!map) { subway.remove(); return; }
+  if (!map) { // 공유 링크로 들어와 지도가 아직 준비되지 않았으면, 준비된 뒤에 다시 그립니다
+    if (window.kakao && kakao.maps) kakao.maps.load(() => { if (subway.isConnected) showWay(f); });
+    else subway.remove();
+    return;
+  }
   const pos = new kakao.maps.LatLng(f.lat, f.lng);
   new kakao.maps.StaticMap(document.getElementById("way-map"), { center: pos, level: 3, marker: { position: pos } });
+  // 컴퓨터: 카카오맵 길찾기를 '대중교통'으로, 도착지를 이 기관으로 채워서 엽니다 (휴대폰은 카카오맵 앱 길찾기 그대로).
+  if (isWide()) new kakao.maps.services.Geocoder().transCoord(f.lng, f.lat, (r, status) => {
+    const a = document.getElementById("detail-transit");
+    if (status !== kakao.maps.services.Status.OK || !a?.isConnected) return;
+    a.href = `https://map.kakao.com/?map_type=TYPE_MAP&target=traffic&rt=${encodeURIComponent(`,,${Math.round(r[0].x)},${Math.round(r[0].y)}`)}&rt1=&rt2=${encodeURIComponent(f.name)}`;
+  }, { input_coord: kakao.maps.services.Coords.WGS84, output_coord: kakao.maps.services.Coords.WCONGNAMUL });
   new kakao.maps.services.Places().categorySearch("SW8", (list, status) => {
     if (!subway.isConnected) return; // 그사이 다른 기관 창을 열었으면 그만둡니다
     if (status === kakao.maps.services.Status.ZERO_RESULT) { subway.textContent = "걸어갈 만한 거리(1.5km)에 지하철역이 없습니다."; return; }
