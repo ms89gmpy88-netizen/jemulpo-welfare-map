@@ -73,6 +73,7 @@ const shownAs = f => f.categories.find(c => checked[group.id].has(group.id === "
 // 지도 표시 색: 지금 켜 둔 항목 가운데 그 기관이 속한 첫 항목의 색
 const colorOf = f => colors[shownAs(f) || f.categories[0]];
 const opened = new Set(); // 소분야를 펼쳐 둔 세부 항목
+let subsOpen = false; // 휴대폰에서 복지시설 세부 항목을 펼쳤는지 (처음엔 접어서 지도·목록이 먼저 보이게)
 const isWide = () => matchMedia("(min-width: 900px)").matches;
 
 // 띄어쓰기를 빼고 비교해서 '송림 동'처럼 입력해도 찾을 수 있게 합니다.
@@ -102,6 +103,17 @@ function drawSubs() {
     </div>`;
   }).join("");
   subs.querySelectorAll("[data-mixed]").forEach(i => { i.indeterminate = true; }); // 일부만 켜졌을 때 '−' 표시
+  // 휴대폰: 복지시설 세부 항목은 단추 하나로 접어 두고, 켜 둔 개수를 단추에 적습니다.
+  const toggle = document.getElementById("subs-toggle");
+  toggle.hidden = !tree;
+  if (tree) {
+    const on = group.subs.filter(s => minorsIn(s).every(m => set.has(s + "|" + m))).length;
+    const some = group.subs.filter(s => minorsIn(s).some(m => set.has(s + "|" + m))).length;
+    const state = on === group.subs.length ? "모두 켜짐" : some ? `${some}개 켜짐` : "모두 꺼짐";
+    toggle.innerHTML = `<span>세부 항목 고르기</span><span class="subs-state">${group.subs.length}개 중 ${state}</span>${icon("chevron")}`;
+    toggle.setAttribute("aria-expanded", String(subsOpen));
+    subs.classList.toggle("folded", !subsOpen);
+  } else subs.classList.remove("folded");
   const none = group.subs.every(s => !facilities.some(f => f.categories.includes(s)));
   const note = document.getElementById("filters-note");
   note.hidden = !none;
@@ -185,6 +197,8 @@ document.getElementById("subs").addEventListener("change", e => {
   closeDetail();
   show();
 });
+// 휴대폰: 세부 항목 고르기 단추
+document.getElementById("subs-toggle").addEventListener("click", () => { subsOpen = !subsOpen; drawSubs(); });
 // 소분야 펼치기·접기
 document.getElementById("subs").addEventListener("click", e => {
   const b = e.target.closest(".expand");
