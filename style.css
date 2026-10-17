@@ -68,7 +68,7 @@ button { font: inherit; color: inherit; }
   background: var(--bg);
   transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
 }
-.search::placeholder { color: #6b746f; }
+.search::placeholder { color: #646d68; } /* 4.9:1 (예전 #6b746f는 4.4:1) */
 .search:focus { outline: none; border-color: var(--accent); background: var(--surface); box-shadow: 0 0 0 3px var(--accent-soft); }
 
 .tools { display: flex; gap: 0.5rem; flex-wrap: wrap; }
@@ -163,7 +163,7 @@ button { font: inherit; color: inherit; }
 #count { margin-left: 0.15rem; color: var(--accent); font-size: 1rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .near-msg { margin: 0.25rem 0 0.5rem; font-size: 0.9rem; color: var(--accent-strong); background: var(--accent-soft); padding: 0.6rem 0.85rem; border-radius: 10px; }
 .notice { margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--muted); }
-.notice summary { cursor: pointer; font-weight: 600; color: var(--accent-strong); padding: 0.25rem 0; width: fit-content; }
+.notice summary { cursor: pointer; font-weight: 600; color: var(--accent-strong); padding: 0.75rem 0; width: fit-content; } /* 누르기 쉬운 높이(44px 안팎) */
 .notice p { margin: 0.35rem 0 0; line-height: 1.6; }
 
 .rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
@@ -201,7 +201,7 @@ button { font: inherit; color: inherit; }
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  min-height: 40px;
+  min-height: 44px;
   margin: 0 0 0.25rem -0.4rem;
   padding: 0 0.6rem;
   border: 0;
@@ -217,7 +217,7 @@ button { font: inherit; color: inherit; }
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 0.9rem;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -387,7 +387,7 @@ button { font: inherit; color: inherit; }
 .expand .ic { transform: rotate(90deg); transition: transform 0.18s var(--ease); }
 .expand[aria-expanded="true"] .ic { transform: rotate(-90deg); }
 .minors { padding: 0 0 0.35rem 1.45rem; }
-.minor { min-height: 40px; font-size: 0.92rem; font-weight: 500; }
+.minor { min-height: 44px; font-size: 0.92rem; font-weight: 500; }
 @media (prefers-reduced-motion: reduce) { .expand .ic { transition: none; } }
 
 /* 관광명소 사진 (위키미디어 공용) */
@@ -420,7 +420,7 @@ button { font: inherit; color: inherit; }
   .subs.tree .tree-head .subitem:has(input:checked) { border: 0; border-radius: 10px; background: none; padding: 0.3rem 0.4rem; }
   .subs.tree .minors { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0 0 0.6rem 1.6rem; }
   .subs.tree .minors[hidden] { display: none; }
-  .subs.tree .minor { min-height: 40px; }
+  .subs.tree .minor { min-height: 44px; }
 }
 
 /* 오시는 길: 정류장마다 지나는 버스 번호 */

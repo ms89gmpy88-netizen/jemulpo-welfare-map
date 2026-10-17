@@ -378,6 +378,9 @@ function showWay(f) {
   }
   const pos = new kakao.maps.LatLng(f.lat, f.lng);
   new kakao.maps.StaticMap(document.getElementById("way-map"), { center: pos, level: 3, marker: { position: pos } });
+  // 작은 지도는 카카오맵으로 가는 링크인데 글자가 없어서, 화면 읽기 프로그램이 읽을 이름을 붙입니다.
+  const wayLink = document.querySelector("#way-map a");
+  if (wayLink) { wayLink.setAttribute("aria-label", `${f.name} 위치를 카카오맵에서 크게 보기 (새 창)`); wayLink.rel = "noopener"; }
   // 컴퓨터: 카카오맵 길찾기를 '대중교통'으로, 도착지를 이 기관으로 채워서 엽니다 (휴대폰은 카카오맵 앱 길찾기 그대로).
   if (isWide()) new kakao.maps.services.Geocoder().transCoord(f.lng, f.lat, (r, status) => {
     const a = document.getElementById("detail-transit");

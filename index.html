@@ -26,7 +26,7 @@
     </div>
   </header>
 
-  <div class="app">
+  <main class="app">
     <!-- 왼쪽: 대분야 (script.js의 GROUPS) -->
     <nav class="rail" id="rail" aria-label="대분야"></nav>
 
@@ -47,7 +47,7 @@
     <section class="list" id="list" aria-label="목록">
       <div id="list-view">
         <div class="list-head">
-          <h2 id="list-title">목록 <span id="count"></span></h2>
+          <h2 id="list-title">목록 <span id="count" aria-live="polite" aria-atomic="true"></span></h2>
           <p id="near-msg" class="near-msg" hidden></p>
           <details class="notice">
             <summary>자료 출처와 이용 안내</summary>
@@ -58,7 +58,7 @@
       </div>
       <div id="detail-view" class="detail-view dbody" hidden></div>
     </section>
-  </div>
+  </main>
 
   <!-- 휴대폰에서 상세정보 창 (컴퓨터에서는 오른쪽 목록 자리에 나옵니다) -->
   <dialog id="detail" class="detail" aria-labelledby="detail-name">
