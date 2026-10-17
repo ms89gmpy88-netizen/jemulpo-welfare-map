@@ -261,7 +261,7 @@ button { font: inherit; color: inherit; }
   .subs::-webkit-scrollbar { display: none; }
   .subitem { flex: none; border: 1px solid var(--line); border-radius: 999px; padding: 0.3rem 0.85rem 0.3rem 0.65rem; background: var(--surface); }
   .subitem:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
-  .map { position: sticky; top: 3.75rem; z-index: 5; height: min(32vh, 300px); min-height: 160px; border-bottom: 1px solid var(--line); } /* 첫 화면에 목록 첫 줄이 보이도록 (예전 36vh) */
+  .map { position: sticky; top: 3.75rem; z-index: 5; height: min(42vh, 380px); min-height: 200px; border-bottom: 1px solid var(--line); } /* 사용자 요청으로 키움(2026-10-17, 32vh → 42vh). 목록은 지도 아래에서 이어짐 */
   .list { min-height: 50vh; }
   body.map-folded .map { display: none; }
 }
@@ -458,5 +458,5 @@ button { font: inherit; color: inherit; }
   .top p { display: none; }
 }
 @media (max-width: 899px) and (max-height: 700px) {
-  .map { height: 26vh; }
+  .map { height: 36vh; }
 }
