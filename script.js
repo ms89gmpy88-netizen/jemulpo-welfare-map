@@ -323,9 +323,9 @@ function openDetail(f) {
     <ul class="way-list">
       <li>${esc(f.address)}</li>
       <li id="way-subway">가까운 지하철역 찾는 중…</li>
-      <li>${f.bus ? "가까운 버스 정류장: " + f.bus.map(([n, m]) => `${esc(n)} (약 ${m < 50 ? 50 : Math.round(m / 10) * 10}m, 걸어서 약 ${Math.max(1, Math.round(m / 67))}분)`).join(", ") : "걸어갈 만한 거리(500m)에 버스 정류장 자료가 없습니다."}</li>
+      ${f.bus ? f.bus.map(([n, m, no]) => `<li class="bus-stop">버스 정류장 <b>${esc(n)}</b> (약 ${m < 50 ? 50 : Math.round(m / 10) * 10}m, 걸어서 약 ${Math.max(1, Math.round(m / 67))}분)${no.length ? `<span class="bus-no">${no.map(x => `<span>${esc(x)}</span>`).join("")}</span>` : ""}</li>`).join("") : "<li>걸어갈 만한 거리(500m)에 버스 정류장이 없습니다.</li>"}
     </ul>
-    <p class="note">거리는 직선거리라 실제로 걷는 길은 더 멀 수 있습니다. 버스 정류장 위치는 OpenStreetMap 자료(© OpenStreetMap 기여자)입니다. 지나는 버스 번호와 갈아타는 길은 '대중교통 길찾기'에서 확인하세요.</p>
+    <p class="note">거리는 직선거리라 실제로 걷는 길은 더 멀 수 있습니다. 버스 정류장과 지나는 버스는 국토교통부 버스정류소정보(2026-10-17)이며, 길 건너 반대 방향 정류장의 버스도 함께 적었습니다. 갈아타는 길과 도착 시간은 '대중교통 길찾기'에서 확인하세요.</p>
     <p class="actions">
       <a class="pin-btn" id="detail-transit" href="https://map.kakao.com/link/to/${encodeURIComponent(f.name)},${f.lat},${f.lng}" target="_blank" rel="noopener">${icon("bus")}대중교통 길찾기</a>
       <button class="pin-btn" type="button" id="detail-map">${icon("pin")}지도에서 보기</button>

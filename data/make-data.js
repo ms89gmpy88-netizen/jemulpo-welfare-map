@@ -137,14 +137,21 @@ facilities.forEach(f => {
 const picsMissing = pics.map(r => r["시설명"]).filter(n => !facilities.some(f => f.name === n));
 if (picsMissing.length) console.log("관광명소사진.csv에만 있고 목록에 없는 이름: " + picsMissing.join(", "));
 
-// 오시는 길: 가까운 버스 정류장 (OpenStreetMap 자료, 500m 안, 이름이 다른 곳 2개까지. 길 건너 같은 이름 정류장은 하나로)
-const stops = parse("버스정류장.csv").map(r => ({ name: r["정류장명"], ref: r["정류장번호"], lat: +r["위도"], lng: +r["경도"] }));
+// 오시는 길: 가까운 버스 정류장과 지나는 버스 (국토교통부 TAGO 자료, data/fetch-bus.js로 받음)
+// 500m 안에서 이름이 다른 정류장 2곳까지. 버스 번호는 길 건너 같은 이름 정류장(200m 안)까지 합칩니다.
+const stops = parse("버스정류장.csv").map(r => ({ name: r["정류장명"], id: r["정류장ID"], lat: +r["위도"], lng: +r["경도"] }));
+const lines = {};
+parse("버스노선.csv").forEach(r => (lines[r["정류장ID"]] ||= new Set()).add(r["버스번호"]));
+const byNumber = (a, b) => (parseInt(a) || 9999) - (parseInt(b) || 9999) || a.localeCompare(b, "ko");
 facilities.forEach(f => {
   if (!f.lat) return;
-  const near = [];
-  for (const s of stops.map(s => ({ s, d: km(f, s) })).filter(x => x.d <= 0.5).sort((a, b) => a.d - b.d))
-    if (!near.some(n => n[0] === s.s.name) && near.length < 2) near.push([s.s.name, Math.round(s.d * 1000)]);
-  if (near.length) f.bus = near;
+  const near = stops.map(s => ({ s, d: km(f, s) })).filter(x => x.d <= 0.5).sort((a, b) => a.d - b.d), bus = [];
+  for (const { s, d } of near) {
+    if (bus.some(b => b[0] === s.name) || bus.length >= 2) continue;
+    const no = new Set(near.filter(x => x.s.name === s.name && km(s, x.s) < 0.2).flatMap(x => [...(lines[x.s.id] || [])]));
+    bus.push([s.name, Math.round(d * 1000), [...no].sort(byNumber)]);
+  }
+  if (bus.length) f.bus = bus;
 });
 
 // 화면의 세부 항목(체크박스)으로 나눕니다. 대피소·쉼터는 시설유형 글자로 나눕니다.

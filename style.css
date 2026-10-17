@@ -422,3 +422,8 @@ button { font: inherit; color: inherit; }
   .subs.tree .minors[hidden] { display: none; }
   .subs.tree .minor { min-height: 40px; }
 }
+
+/* 오시는 길: 정류장마다 지나는 버스 번호 */
+.way-list .bus-stop b { font-weight: 700; }
+.bus-no { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.3rem 0 0.4rem; }
+.bus-no span { font-size: 0.82rem; font-weight: 700; line-height: 1.5; padding: 0 0.45rem; border-radius: 6px; background: var(--accent-soft); color: var(--accent-strong); font-variant-numeric: tabular-nums; }
