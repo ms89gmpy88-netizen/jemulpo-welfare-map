@@ -493,3 +493,30 @@ button { font: inherit; color: inherit; }
 @media (max-width: 899px) {
   .rail button { padding: 0.5rem 0.1rem; font-size: 0.78rem; }
 }
+
+/* 화면에는 안 보이고 화면 읽기 프로그램만 읽는 글 */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+/* 동네 고르기 */
+.list-title-row { justify-content: flex-start; }
+.list-title-row h2 { flex: 1 1 100%; }
+.dong-pick select {
+  min-height: 44px; padding: 0 2.2rem 0 0.9rem;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2359645e' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.75rem center / 1rem;
+  font: inherit; font-size: 0.92rem; font-weight: 700; color: var(--ink); appearance: none; cursor: pointer;
+}
+.dong-pick select:hover { border-color: var(--ink); }
+/* 처음이세요? 버튼과 상황별 안내 */
+.guide-btn { background: var(--accent-soft); border-color: var(--accent-soft); color: var(--accent-strong); }
+.guide-lead { margin: 0.4rem 0 1rem; color: var(--muted); }
+.guide-item { border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 0.6rem; background: var(--surface); }
+.guide-item summary { min-height: 52px; padding: 0.85rem 1rem; font-weight: 800; font-size: 1.02rem; cursor: pointer; }
+.guide-item[open] summary { border-bottom: 1px solid var(--line); color: var(--accent-strong); }
+.guide-item ol { margin: 0.75rem 0 0.25rem; padding: 0 1rem 0 2.2rem; line-height: 1.7; }
+.guide-item li + li { margin-top: 0.35rem; }
+.guide-calls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 1rem 0.9rem; }
+.guide-go {
+  display: inline-flex; align-items: center; gap: 0.4rem; min-height: 44px; padding: 0 1rem;
+  border: 0; border-radius: 10px; background: var(--accent); color: #fff; font-weight: 700; cursor: pointer;
+}
+.guide-go:hover { background: var(--accent-strong); }

@@ -73,6 +73,9 @@ facilities.forEach(f => {
 // 지도 좌표: coords.json (주소 → [위도, 경도]), 카카오 주소 검색으로 만든 파일입니다.
 const coords = JSON.parse(fs.readFileSync(path.join(__dirname, "coords.json"), "utf8"));
 facilities.forEach(f => { if (coords[f.address]) [f.lat, f.lng] = coords[f.address]; });
+// 행정동(동 행정복지센터 구역): 행정동.json (주소 → 동). 카카오 좌표→행정구역(coord2RegionCode)으로 만든 파일. '동네로 고르기'에 씁니다.
+const dongs = JSON.parse(fs.readFileSync(path.join(__dirname, "행정동.json"), "utf8"));
+facilities.forEach(f => { if (dongs[f.address]) f.dong = dongs[f.address]; });
 
 // 같은 기관 합치기: 이름이 같고 300m 안(좌표가 없으면 전화번호가 같으면)이면 한 카드로 모읍니다.
 // 예) 경로당이면서 무더위쉼터인 곳, 재가시설·장기요양기관으로 따로 등록된 곳
@@ -101,7 +104,7 @@ for (const g of merged) {
     f.categories = [...new Set(g.flatMap(x => x.categories))];
     f.type = uniq(g.map(x => x.type), "·");
     f.service = uniq(g.map(x => x.service), ", ");
-    for (const k of ["hours", "homepage", "operatorType", "corp", "lat", "lng"]) f[k] ??= g.find(x => x[k])?.[k];
+    for (const k of ["hours", "homepage", "operatorType", "corp", "lat", "lng", "dong"]) f[k] ??= g.find(x => x[k])?.[k];
     // 전화: 기관 자체 번호를 먼저 쓰고, 없을 때만 쉼터 자료의 구청 담당 부서 번호(문의처)를 씁니다.
     const tel = g.find(x => x.phone && !x.phoneLabel) || g.find(x => x.phone);
     f.phone = tel?.phone; f.phoneLabel = tel?.phoneLabel;
@@ -202,3 +205,5 @@ const noPinOk = ["민방위교육장 지하 1층"];
 const noPin = facilities.filter(f => !f.private && f.lat === undefined && !noPinOk.includes(f.name)).map(f => f.name);
 if (noPin.length) console.log("좌표 없음(지도에 안 나옴): " + noPin.join(", ") + " → 주소가 바뀌었으면 coords.json도 새로 만들어야 합니다");
 console.log(facilities.length + "곳 저장",Object.fromEntries(tabs.map(t => [t, facilities.filter(f => f.categories.includes(t)).length])));
+const noDong = facilities.filter(f => f.lat !== undefined && !f.dong).map(f => f.name);
+if (noDong.length) console.log("행정동 없음: " + noDong.join(", ") + " → 새 주소는 행정동.json에도 넣어야 합니다(카카오 coord2RegionCode)");

@@ -205,9 +205,11 @@ function show() {
     : facilities.filter(shownAs);
   // 지금 문 연 곳만: 운영 시간을 아는 곳 중 지금 운영 중인 곳
   if (openOnly) current = current.filter(f => openNow(f)?.open);
+  // 동네로 고르기
+  if (dongSel) current = current.filter(f => f.dong === dongSel);
   // 내 주변 순: 위치가 있는 기관을 가까운 순으로, 위치를 모르는 기관은 맨 뒤로
   if (me) current = current.map(f => ({ f, d: f.lat ? km(me, f) : Infinity })).sort((a, b) => a.d - b.d).map(({ f, d }) => (f.dist = d, f));
-  document.getElementById("list-title").firstChild.textContent = q ? `'${searchBox.value.trim()}' 검색 결과 ` : group.name + " ";
+  document.getElementById("list-title").firstChild.textContent = (q ? `'${searchBox.value.trim()}' 검색 결과` : group.name) + (dongSel ? ` · ${dongSel} ` : " ");
   document.getElementById("count").textContent = current.length + "곳";
   document.getElementById("cards").innerHTML = current.length
     ? current.map((f, i) => `
@@ -220,7 +222,7 @@ function show() {
         </span>
         ${me && f.dist < Infinity ? `<span class="dist">${distText(f.dist)}</span>` : icon("chevron")}
       </button></li>`).join("")
-    : `<li class="empty">${q ? "검색 결과가 없습니다. 다른 말로 찾아보세요." : openOnly ? "지금 문 연 곳이 없습니다. '지금 문 연 곳만'을 끄면 모두 보입니다." : checked[group.id].size ? "이 분야의 자료를 모으고 있어요." : group.id === "need" ? "왼쪽(휴대폰은 위)에서 필요한 도움을 골라 주세요." : "보고 싶은 항목을 골라 주세요."}</li>`;
+    : `<li class="empty">${q ? "검색 결과가 없습니다. 다른 말로 찾아보세요." : dongSel ? `${dongSel}에는 해당하는 곳이 없어요. 동네를 '모든 동네'로 바꿔 보세요.` : openOnly ? "지금 문 연 곳이 없습니다. '지금 문 연 곳만'을 끄면 모두 보입니다." : checked[group.id].size ? "이 분야의 자료를 모으고 있어요." : group.id === "need" ? "왼쪽(휴대폰은 위)에서 필요한 도움을 골라 주세요." : "보고 싶은 항목을 골라 주세요."}</li>`;
   const ob = document.getElementById("open-only"), om = document.getElementById("open-msg");
   ob.setAttribute("aria-pressed", String(openOnly));
   om.hidden = !openOnly;
@@ -559,6 +561,98 @@ if (window.kakao && kakao.maps) {
   });
   addEventListener("resize", () => map && map.relayout());
 }
+
+// ───── 동네(행정동)로 고르기: 기관마다 facilities.js의 dong(행정복지센터 구역)
+let dongSel = "";
+try { dongSel = localStorage.getItem("dong") || ""; } catch (e) {}
+const dongBox = document.getElementById("dong");
+dongBox.insertAdjacentHTML("beforeend", [...new Set(facilities.map(f => f.dong).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ko"))
+  .map(d => `<option value="${esc(d)}">${esc(d)}</option>`).join(""));
+if (![...dongBox.options].some(o => o.value === dongSel)) dongSel = "";
+dongBox.value = dongSel;
+dongBox.addEventListener("change", () => {
+  dongSel = dongBox.value;
+  try { localStorage.setItem("dong", dongSel); } catch (e) {}
+  closeDetail(); show();
+  // 고른 동네의 기관이 지도에 다 보이게
+  if (map && dongSel && current.some(f => f.lat)) {
+    const b = new kakao.maps.LatLngBounds();
+    current.filter(f => f.lat).forEach(f => b.extend(new kakao.maps.LatLng(f.lat, f.lng)));
+    map.setBounds(b);
+  }
+});
+
+// ───── 처음이세요? 상황별 안내 (제도 안내·제물포구청·보건소 안내 기준의 일반 안내. 자격·절차는 바뀔 수 있음)
+const GUIDES = [
+  { title: "부모님(어르신)이 돌봄이 필요할 때", need: "어르신 돌봄", steps: [
+    "혼자 생활하기 어려우시면 국민건강보험공단에 '장기요양 인정'을 신청합니다(전화, 지사 방문, 장기요양보험 누리집).",
+    "공단 직원이 집으로 찾아와 조사한 뒤 등급 결과를 알려 줍니다.",
+    "등급을 받으면 집으로 오는 방문요양, 낮에 다니는 주야간보호, 들어가서 지내는 요양원(주로 1~2등급) 가운데 골라 기관에 연락해 상담·계약합니다.",
+    "등급이 나오지 않거나 가벼운 도움이 필요하면 사는 동 행정복지센터에 '노인맞춤돌봄서비스'를 문의합니다(만 65세 이상 기초생활수급자·차상위·기초연금 수급자 등)."],
+    calls: [["국민건강보험공단", "1577-1000"]] },
+  { title: "아이를 맡길 곳이 필요할 때", need: "아이 돌봄·보육", steps: [
+    "어린이집은 아이사랑 포털(childcare.go.kr)에서 입소대기를 신청하거나 어린이집에 직접 상담합니다. 만 0~5세 보육료는 정부가 지원합니다.",
+    "초등학생 방과후·방학 돌봄은 다함께돌봄센터(초등학생)와 지역아동센터(돌봄이 필요한 아동)에 직접 전화해 자리가 있는지 묻습니다.",
+    "장난감·책을 빌리려면 도담도담장난감월드(송림점·동인천점)를 이용합니다."], calls: [] },
+  { title: "생활이 어렵거나 갑자기 위기에 처했을 때", need: "상담·위기 지원", need2: "식사 도움", steps: [
+    "국번 없이 129(보건복지상담센터)에 전화하면 받을 수 있는 지원을 안내받을 수 있습니다.",
+    "사는 동 행정복지센터를 찾아가 긴급복지지원, 기초생활보장 등을 상담·신청합니다.",
+    "먹거리가 급하면 행정복지센터에 문의해 이용 대상인지 확인한 뒤 푸드마켓을 이용합니다.",
+    "종합사회복지관에서도 상담과 사례관리를 받을 수 있습니다."], calls: [["보건복지상담센터", "129"]] },
+  { title: "폭력 피해를 당했거나 위험할 때", need: "상담·위기 지원", steps: [
+    "지금 위험하면 바로 112에 신고합니다. 아동학대가 의심될 때도 112입니다.",
+    "여성긴급전화 1366은 24시간 상담하고 보호시설로 연결해 줍니다.",
+    "가정폭력·성폭력상담소에 전화하거나 방문해 상담합니다. 보호시설 위치는 안전을 위해 공개하지 않습니다."],
+    calls: [["경찰", "112"], ["여성긴급전화", "1366"]] },
+  { title: "마음이 힘들거나 술·도박 등을 끊고 싶을 때", need: "건강·치매·마음", steps: [
+    "죽고 싶은 생각이 들 만큼 힘들면 자살예방 상담전화 109(24시간)에 전화합니다.",
+    "정신건강 위기상담 1577-0199로도 상담할 수 있습니다.",
+    "제물포구 정신건강복지센터, 중독관리통합지원센터에 전화하거나 방문해 상담합니다."],
+    calls: [["자살예방 상담전화", "109"], ["정신건강 위기상담", "1577-0199"]] },
+  { title: "기억력이 걱정될 때(치매)", need: "건강·치매·마음", steps: [
+    "만 60세 이상이면 치매안심센터에서 치매 검사를 받을 수 있습니다. 전화로 예약한 뒤 방문합니다.",
+    "치매 진단을 받으면 센터에 등록해 지원과 가족 상담을 받고, 장기요양 등급이 있으면 치매전담형 주간보호센터도 이용할 수 있습니다."],
+    calls: [["치매안심센터 검사 예약", "032-770-7655"]] },
+  { title: "장애가 있는 가족을 위한 도움", need: "장애인 지원", steps: [
+    "장애인 등록은 병원 진단을 받은 뒤 사는 동 행정복지센터에 신청합니다.",
+    "장애인복지관(신흥장애인종합복지관 등)에서 상담, 재활, 프로그램을 안내받습니다.",
+    "낮 시간 돌봄은 장애인 주간이용시설, 일자리는 보호작업장·근로사업장에 문의합니다."], calls: [] },
+  { title: "일자리를 찾을 때", need: "일자리·자활", steps: [
+    "60세 이상 어르신은 노인인력개발센터에서 노인일자리를 신청합니다(모집은 보통 연초, '노인일자리 여기'(seniorro.or.kr)에서도 신청).",
+    "기초생활수급자·차상위계층 등은 사는 동 행정복지센터에 자활사업 참여를 신청하면 지역자활센터로 연계됩니다."], calls: [] },
+  { title: "폭염·한파 때", need: "더위·추위 피할 곳", steps: [
+    "가까운 무더위쉼터·한파쉼터에서 쉬어 갑니다. 운영 기간과 시간은 쉼터마다 다르니 상세정보에서 확인하세요.",
+    "어지럽거나 몸이 이상하면 바로 119에 전화합니다."], calls: [["119", "119"]] },
+];
+const guide = document.getElementById("guide");
+function openGuide() {
+  document.getElementById("guide-body").innerHTML = `
+    <h2 id="guide-title">처음이세요? 상황별 안내</h2>
+    <p class="guide-lead">어떤 일이 있으신지 골라 보세요. 무엇부터 하면 되는지와 맞는 기관을 알려 드려요.</p>
+    ${GUIDES.map((g, i) => `
+    <details class="guide-item"${i === 0 ? " open" : ""}>
+      <summary>${esc(g.title)}</summary>
+      <ol>${g.steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol>
+      ${g.calls.length ? `<p class="guide-calls">${g.calls.map(([n, t]) => `<a class="pin-btn" href="tel:${esc(t)}">${icon("phone")}${esc(n)}${n === t ? "" : " " + esc(t)}</a>`).join("")}</p>` : ""}
+      <p class="guide-calls"><button type="button" class="guide-go" data-need="${esc(g.need)}"${g.need2 ? ` data-need2="${esc(g.need2)}"` : ""}>${icon("map")}맞는 기관 보기 (${esc([g.need, g.need2].filter(Boolean).join(", "))})</button></p>
+    </details>`).join("")}
+    <p class="note">제도 안내와 제물포구청·보건소 안내를 바탕으로 한 일반 안내입니다. 자격과 절차는 바뀔 수 있으니 전화로 꼭 확인하세요.</p>`;
+  guide.showModal(); guide.scrollTop = 0;
+}
+document.getElementById("guide-open").addEventListener("click", openGuide);
+guide.querySelector(".close").addEventListener("click", () => guide.close());
+guide.addEventListener("click", e => {
+  if (e.target === guide) return guide.close(); // 바깥 누르면 닫기
+  const b = e.target.closest(".guide-go");
+  if (!b) return;
+  // '도움 찾기'로 바꾸고 그 도움만 켭니다.
+  group = GROUPS[0];
+  checked.need = new Set([b.dataset.need, b.dataset.need2].filter(Boolean));
+  searchBox.value = "";
+  guide.close(); closeDetail();
+  drawRail(); drawSubs(); show();
+  document.getElementById(isWide() ? "list" : "list-view").scrollIntoView({ behavior: "smooth", block: "start" });
+});
 
 drawRail();
 drawSubs();
