@@ -14,6 +14,7 @@ const icons = {
   map: '<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>',
   bus: '<rect x="5" y="3" width="14" height="15" rx="2.5"/><path d="M5 11h14M8 18v2.5M16 18v2.5"/><circle cx="8.5" cy="14.5" r=".6"/><circle cx="15.5" cy="14.5" r=".6"/>',
   photo: '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-9 8"/>',
+  wheel: '<circle cx="10" cy="4.5" r="1.8"/><path d="M10 7.5v6h6l2.5 5"/><path d="M10 10.5h5"/><path d="M7.5 11.2a5.5 5.5 0 1 0 7.6 6.6"/>',
   menu: '<path d="M6 3h12v18H6z"/><path d="M9 8h6M9 12h6M9 16h4"/>',
 };
 const icon = name => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${icons[name]}</svg>`;
@@ -114,7 +115,9 @@ function openNow(f) {
   if (br) return { open: false, breakUntil: hhmm(br[1]) };
   return { open: true, until: hhmm(r[1]) };
 }
-let openOnly = false; // '지금 문 연 곳만' 버튼
+let openOnly = false;
+// 휠체어로 들어갈 수 있다고 확인된 곳: 장애인편의시설 자료(휠체어 출입 칸) 또는 네이버 플레이스의 휠체어 출입 가능 표시
+const wheelOk = f => f.wheel === "가능" || /있음/.test(f.access?.["휠체어 출입"] || ""); // '지금 문 연 곳만' 버튼
 
 GROUPS[0].subs = NEEDS.map(([n]) => n);
 
@@ -218,7 +221,7 @@ function show() {
         <span class="row-main">
           <strong>${esc(f.name)}</strong>
           <span class="addr">${f.private ? "주소 비공개" : esc(f.address)}</span>
-          <span class="meta">${(o => o?.open ? '<span class="open-badge">' + (o.always ? "언제든 방문" : "지금 운영 중") + "</span> " : "")(openNow(f))}${esc(f.categories.join(" · "))}${f.check ? ' <span class="badge">확인 필요</span>' : ""}</span>
+          <span class="meta">${wheelOk(f) ? `<span class="wheel-badge" title="휠체어로 들어갈 수 있어요">${icon("wheel")}휠체어</span> ` : ""}${(o => o?.open ? '<span class="open-badge">' + (o.always ? "언제든 방문" : "지금 운영 중") + "</span> " : "")(openNow(f))}${esc(f.categories.join(" · "))}${f.check ? ' <span class="badge">확인 필요</span>' : ""}</span>
         </span>
         ${me && f.dist < Infinity ? `<span class="dist">${distText(f.dist)}</span>` : icon("chevron")}
       </button></li>`).join("")
@@ -413,6 +416,9 @@ function openDetail(f) {
       ${f.target ? `<p><b>대상</b>${esc(f.target)}</p>` : ""}
       ${f.service ? `<p><b>하는 일</b></p><ul>${f.service.split(/,\s*(?![^()]*\))/).map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
       <p class="hours"><b>운영 시간</b><span>${nowHtml(f)}${hoursHtml(f.hours, f)}</span></p>
+      ${f.fee || f.feeOwn ? `<p class="hours fee"><b>이용료</b><span>${f.fee ? esc(f.fee) : ""}${f.feeOwn ? `<span class="sub own">${f.fee ? "이 기관: " : ""}${esc(f.feeOwn)} <em>(${esc(f.feeSrc)})</em></span>` : ""}</span></p>` : ""}
+      ${f.apply ? `<p class="hours apply"><b>신청 방법</b><span>${esc(f.apply)}</span></p>` : ""}
+      ${f.fee || f.apply ? `<p class="fee-note">이용료·신청 방법은 제도와 구청 안내에 따른 일반 안내예요. 기관마다 다를 수 있으니 전화로 확인하세요.</p>` : ""}
     </div>
     ${f.how ? `<h3>이용 방법</h3><p class="how">${esc(f.how)}</p>` : ""}`}
     ${f.private ? "" : `<table class="info-table${kind === "welfare" || kind === "shelter" ? "" : " short"}">

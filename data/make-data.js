@@ -140,6 +140,21 @@ facilities.forEach(f => {
 const wconvMissing = Object.keys(wconv).filter(n => !facilities.some(f => f.name === n));
 if (wconvMissing.length) console.log("복지시설편의.csv에만 있고 목록에 없는 이름: " + wconvMissing.join(", "));
 
+// 이용료·신청 방법: 시설 종류별 짧은 안내(이용료신청.js) + 기관별로 확인한 금액(기관별이용료.csv)
+const feeGuide = require("./이용료신청.js");
+const feeOwn = Object.fromEntries(parse("기관별이용료.csv").map(r => [r["시설명"], r]));
+const HOT_OR_SAFETY = ["관광명소", "맛집", "분위기 좋은 카페", "경찰서", "해양경찰서", "소방서"];
+facilities.forEach(f => {
+  if (f.categories.every(c => HOT_OR_SAFETY.includes(c))) return;
+  const g = feeGuide.find(([re]) => re.test(f.type));
+  if (g && g[1]) f.fee = g[1];
+  if (g && g[2]) f.apply = g[2];
+  const o = feeOwn[f.name];
+  if (o) [f.feeOwn, f.feeSrc] = [o["이용료"], o["출처"]];
+});
+const feeMissing = Object.keys(feeOwn).filter(n => !facilities.some(f => f.name === n));
+if (feeMissing.length) console.log("기관별이용료.csv에만 있고 목록에 없는 이름: " + feeMissing.join(", "));
+
 // 정보 확인일: 확인일.csv(그날 다시 맞춰 본 곳), 없으면 자료를 모은 날
 const checkedAt = Object.fromEntries(parse("확인일.csv").map(r => [r["시설명"], r]));
 const isGroup = (f, list) => f.categories.some(c => list.includes(c));
