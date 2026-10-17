@@ -27,6 +27,8 @@ const distText = d => d < 1 ? Math.round(d * 1000 / 10) * 10 + "m" : d.toFixed(1
 
 // 왼쪽 대분야와 그 안의 세부 항목. 세부 항목 이름은 facilities.js의 categories와 같습니다.
 const GROUPS = [
+  { id: "need", name: "도움 찾기", icon: '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.8"/><path d="M12 17.2v.01"/>',
+    subs: [] }, // 아래 NEEDS로 채움
   { id: "welfare", name: "복지시설", icon: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
     subs: ["어르신", "장애인", "여성/아동", "한부모/다문화", "복지관/자활", "건강/재활"] },
   { id: "shelter", name: "대피시설", icon: '<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>',
@@ -43,6 +45,79 @@ const colors = {
   "경찰서": "#1b3a8c", "해양경찰서": "#0b7285", "소방서": "#e03131",
   "관광명소": "#7048e8", "맛집": "#e8590c", "분위기 좋은 카페": "#8c5a2b",
 };
+// ───── 도움 찾기: 기관 이름을 몰라도 '필요한 도움'으로 고릅니다. [이름, 색, 맞추는 글자] — 이름·종류·대상·하는 일·분야에서 찾음
+const NEEDS = [
+  ["식사 도움", "#e8590c", /경로식당|식사\s?배달|도시락|무료 점심|급식|푸드마켓|기부식품|반찬/], // 요양원의 '식사'(입소자 식사)는 넣지 않음
+  ["어르신 돌봄", "#c2410c", /주간보호|주야간|방문요양|방문간호|재가|단기보호|노인맞춤돌봄|요양원|노인요양/],
+  ["아이 돌봄·보육", "#d6336c", /어린이집|지역아동센터|다함께돌봄|장난감|공부방|아동양육/],
+  ["건강·치매·마음", "#2f9e44", /보건소|치매|정신건강|중독|건강생활|재활/],
+  ["일자리·자활", "#1c7ed6", /일자리|자활|직업재활|보호작업장|근로사업장|노인인력/],
+  ["상담·위기 지원", "#7048e8", /상담|폭력|아동보호|가족센터|사례관리/],
+  ["장애인 지원", "#5f3dc4", /장애인/],
+  ["여가·배움", "#0b7285", /경로당|복지관|여가|교육 프로그램|청소년수련/],
+  ["더위·추위 피할 곳", "#e67700", /무더위쉼터|한파쉼터/],
+];
+const needText = f => [f.name, f.type, f.target, f.service, f.categories.join(" ")].filter(Boolean).join(" ");
+const needTest = Object.fromEntries(NEEDS.map(([n, , re]) => [n, f => re.test(needText(f))]));
+NEEDS.forEach(([n, c]) => { colors[n] = c; });
+// 그 세부 항목에 드는 기관 수 (도움 찾기는 맞추는 글자로, 나머지는 분야 이름으로)
+const countOf = s => facilities.filter(f => needTest[s] ? needTest[s](f) : f.categories.includes(s)).length;
+
+// ───── 지금 문 연 곳: 운영 시간 글을 요일별 시간표로 읽습니다 (한국 시간 기준)
+// 공휴일(쉬는 날이 '공휴일 휴무'인 곳에 씀). 해마다 다음 해 공휴일을 더해 주세요.
+const HOLIDAYS = new Set(["2026-10-09", "2026-12-25", "2027-01-01", "2027-02-06", "2027-02-07", "2027-02-08", "2027-02-09", "2027-03-01", "2027-05-05", "2027-05-13",
+  "2027-06-06", "2027-08-15", "2027-08-16", "2027-09-14", "2027-09-15", "2027-09-16", "2027-10-03", "2027-10-04", "2027-10-09", "2027-10-11", "2027-12-25", "2027-12-27"]);
+const DAYS = "일월화수목금토";
+const toMin = t => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
+const daysIn = s => { // "토·일요일" "일·월요일" "월요일" → [6, 0]
+  const m = s.match(/^([월화수목금토일](?:[·,]\s?[월화수목금토일])*)요일/);
+  return m ? m[1].split(/[·,]\s?/).map(d => DAYS.indexOf(d)) : null;
+};
+// 운영 시간 글 → { 요일번호: [[시작분, 끝분]], breaks: [[..]], holidayOff } , 읽을 수 없으면 null
+function schedule(h) {
+  if (!h || /24시간 생활|학기 중|방학 중/.test(h)) return null;
+  const parts = h.split(" / ").map(s => s.trim()), week = {}, breaks = [];
+  let holidayOff = false, base = null;
+  const set = (ds, a, b) => ds.forEach(d => { week[d] = [[toMin(a), toMin(b) <= toMin(a) ? toMin(b) + 1440 : toMin(b)]]; });
+  for (const p of parts) {
+    const t = p.match(/(\d{1,2}:\d\d)\s*~\s*(\d{1,2}:\d\d)/);
+    if (/^[월화수목금토일](,[월화수목금토일])*$/.test(p)) { base = p.split(",").map(d => DAYS.indexOf(d)); continue; }
+    if (/(^|[·,s])공휴일( 휴무| 휴관|[·,])/.test(p) && /휴무|휴관/.test(p)) holidayOff = true; // "월요일 휴관(공휴일이면 다음 날)"은 아님
+    if (/^(점심|브레이크타임)/.test(p) && t) { breaks.push([toMin(t[1]), toMin(t[2])]); continue; }
+    const ds = daysIn(p);
+    if (ds && /휴무|휴관/.test(p) && !t) { ds.forEach(d => delete week[d]); continue; }
+    if (ds && t) { set(ds, t[1], t[2]); continue; }
+    if (/^평일/.test(p) && t) { set(base ? base.filter(d => d >= 1 && d <= 5) : [1, 2, 3, 4, 5], t[1], t[2]); continue; }
+    if (/^주말/.test(p) && t) { set(base ? base.filter(d => d === 0 || d === 6) : [0, 6], t[1], t[2]); continue; }
+    if (t && base && !Object.keys(week).length) { set(base, t[1], t[2]); continue; }
+  }
+  return Object.keys(week).length ? { week, breaks, holidayOff } : null;
+}
+// 지금 한국 시간: 요일, 분, 날짜
+function seoulNow() {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false, weekday: "short" })
+    .formatToParts(new Date()).map(x => [x.type, x.value]));
+  return { day: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(p.weekday), min: (+p.hour % 24) * 60 + +p.minute, date: `${p.year}-${p.month}-${p.day}` };
+}
+const hhmm = m => `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+// 지금 문 열었는지: { open, until } / 알 수 없으면 null. 거리·공원·산책로는 늘 열려 있음
+function openNow(f) {
+  if (!f.hours && /^(거리|공원|산책로)(·|$)/.test(f.type) && f.categories.includes("관광명소")) return { open: true, always: true };
+  const s = schedule(f.hours);
+  if (!s) return null;
+  const now = seoulNow();
+  if (s.holidayOff && HOLIDAYS.has(now.date)) return { open: false, holiday: true };
+  const check = (day, min) => (s.week[day] || []).find(([a, b]) => min >= a && min < b);
+  let r = check(now.day, now.min) || check((now.day + 6) % 7, now.min + 1440); // 자정을 넘는 영업
+  if (!r) return { open: false };
+  const br = s.breaks.find(([a, b]) => now.min >= a && now.min < b);
+  if (br) return { open: false, breakUntil: hhmm(br[1]) };
+  return { open: true, until: hhmm(r[1]) };
+}
+let openOnly = false; // '지금 문 연 곳만' 버튼
+
+GROUPS[0].subs = NEEDS.map(([n]) => n);
+
 // 복지시설의 소분야: 세부 항목 안에서 시설 종류로 한 번 더 나눕니다. [소분야 이름, 시설 종류 글자] — 위에서부터 먼저 맞는 것
 const MINORS = {
   "어르신": [["노인복지관", /노인여가복지/], ["경로당", /경로당/], ["재가·주야간보호", /재가/], ["요양원", /노인요양시설/], ["일자리·치매 지원", /노인일자리|치매/]],
@@ -63,13 +138,13 @@ const pinImage = color => pins[color] ||= new kakao.maps.MarkerImage(
   "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38"><path d="M14 1C7 1 1.5 6.4 1.5 13.3 1.5 22.5 14 37 14 37s12.5-14.5 12.5-23.7C26.5 6.4 21 1 14 1z" fill="${color}" stroke="#fff" stroke-width="2"/><circle cx="14" cy="13.5" r="4.5" fill="#fff"/></svg>`),
   new kakao.maps.Size(28, 38), { offset: new kakao.maps.Point(14, 37) });
 
-let group = GROUPS[0];
+let group = GROUPS[1]; // 처음엔 복지시설
 // 켜 둔 항목. 복지시설은 '어르신|경로당'처럼 소분야까지 적습니다. 처음에는 모두 켭니다.
 const keysOf = g => g.id === "welfare" ? g.subs.flatMap(c => minorsIn(c).map(m => c + "|" + m)) : g.subs;
-const checked = Object.fromEntries(GROUPS.map(g => [g.id, new Set(keysOf(g))]));
+const checked = Object.fromEntries(GROUPS.map(g => [g.id, new Set(g.id === "need" ? [] : keysOf(g))])); // 도움 찾기는 처음에 아무것도 안 고름
 const groupOf = sub => GROUPS.find(g => g.subs.includes(sub));
 // 그 기관이 지금 켜 둔 항목에 들어가면 그 세부 항목 이름을, 아니면 undefined
-const shownAs = f => f.categories.find(c => checked[group.id].has(group.id === "welfare" && MINORS[c] ? c + "|" + minorOf(f, c) : c));
+const shownAs = f => group.id === "need" ? GROUPS[0].subs.find(n => checked.need.has(n) && needTest[n](f)) : f.categories.find(c => checked[group.id].has(group.id === "welfare" && MINORS[c] ? c + "|" + minorOf(f, c) : c));
 // 지도 표시 색: 지금 켜 둔 항목 가운데 그 기관이 속한 첫 항목의 색
 const colorOf = f => colors[shownAs(f) || f.categories[0]];
 const opened = new Set(); // 소분야를 펼쳐 둔 세부 항목
@@ -90,7 +165,7 @@ function drawSubs() {
   const tree = group.id === "welfare";
   subs.classList.toggle("tree", tree);
   subs.innerHTML = group.subs.map(s => {
-    const n = facilities.filter(f => f.categories.includes(s)).length;
+    const n = countOf(s);
     if (!tree) return `<label class="subitem${n ? "" : " empty-sub"}" style="--dot:${colors[s]}"><input type="checkbox" value="${esc(s)}"${set.has(s) ? " checked" : ""}${n ? "" : " disabled"}><span class="dot"></span><span class="sub-name">${esc(s)}</span><span class="sub-n">${n}</span></label>`;
     // 복지시설: 세부 항목(전체 켜기/끄기) 아래에 소분야 체크박스
     const ms = minorsIn(s), on = ms.filter(m => set.has(s + "|" + m)).length, open = opened.has(s);
@@ -114,10 +189,12 @@ function drawSubs() {
     toggle.setAttribute("aria-expanded", String(subsOpen));
     subs.classList.toggle("folded", !subsOpen);
   } else subs.classList.remove("folded");
-  const none = group.subs.every(s => !facilities.some(f => f.categories.includes(s)));
+  const none = group.subs.every(s => !countOf(s));
   const note = document.getElementById("filters-note");
-  note.hidden = !none;
-  note.textContent = none ? "이 분야의 자료를 모으고 있어요. 곧 채워 넣을게요." : "";
+  const needNote = group.id === "need" ? "어떤 도움이 필요하세요? 고르면 분야와 상관없이 맞는 곳을 모두 보여 드려요. 여러 개 고를 수 있어요." : "";
+  note.hidden = !none && !needNote;
+  note.textContent = none ? "이 분야의 자료를 모으고 있어요. 곧 채워 넣을게요." : needNote;
+  document.getElementById("filters").classList.toggle("need-mode", group.id === "need");
 }
 
 function show() {
@@ -126,6 +203,8 @@ function show() {
   current = q
     ? facilities.filter(f => squash(f.name + f.address + f.type + f.target + f.service + (f.menu || []).join("")).includes(q))
     : facilities.filter(shownAs);
+  // 지금 문 연 곳만: 운영 시간을 아는 곳 중 지금 운영 중인 곳
+  if (openOnly) current = current.filter(f => openNow(f)?.open);
   // 내 주변 순: 위치가 있는 기관을 가까운 순으로, 위치를 모르는 기관은 맨 뒤로
   if (me) current = current.map(f => ({ f, d: f.lat ? km(me, f) : Infinity })).sort((a, b) => a.d - b.d).map(({ f, d }) => (f.dist = d, f));
   document.getElementById("list-title").firstChild.textContent = q ? `'${searchBox.value.trim()}' 검색 결과 ` : group.name + " ";
@@ -137,11 +216,14 @@ function show() {
         <span class="row-main">
           <strong>${esc(f.name)}</strong>
           <span class="addr">${f.private ? "주소 비공개" : esc(f.address)}</span>
-          <span class="meta">${esc(f.categories.join(" · "))}${f.check ? ' <span class="badge">확인 필요</span>' : ""}</span>
+          <span class="meta">${(o => o?.open ? '<span class="open-badge">' + (o.always ? "언제든 방문" : "지금 운영 중") + "</span> " : "")(openNow(f))}${esc(f.categories.join(" · "))}${f.check ? ' <span class="badge">확인 필요</span>' : ""}</span>
         </span>
         ${me && f.dist < Infinity ? `<span class="dist">${distText(f.dist)}</span>` : icon("chevron")}
       </button></li>`).join("")
-    : `<li class="empty">${q ? "검색 결과가 없습니다. 다른 말로 찾아보세요." : checked[group.id].size ? "이 분야의 자료를 모으고 있어요." : "보고 싶은 항목을 골라 주세요."}</li>`;
+    : `<li class="empty">${q ? "검색 결과가 없습니다. 다른 말로 찾아보세요." : openOnly ? "지금 문 연 곳이 없습니다. '지금 문 연 곳만'을 끄면 모두 보입니다." : checked[group.id].size ? "이 분야의 자료를 모으고 있어요." : group.id === "need" ? "왼쪽(휴대폰은 위)에서 필요한 도움을 골라 주세요." : "보고 싶은 항목을 골라 주세요."}</li>`;
+  const ob = document.getElementById("open-only"), om = document.getElementById("open-msg");
+  ob.setAttribute("aria-pressed", String(openOnly));
+  om.hidden = !openOnly;
   drawMarkers();
 }
 
@@ -197,6 +279,8 @@ document.getElementById("subs").addEventListener("change", e => {
   closeDetail();
   show();
 });
+// 지금 문 연 곳만 켜고 끄기
+document.getElementById("open-only").addEventListener("click", () => { openOnly = !openOnly; closeDetail(); show(); });
 // 휴대폰: 세부 항목 고르기 단추
 document.getElementById("subs-toggle").addEventListener("click", () => { subsOpen = !subsOpen; drawSubs(); });
 // 소분야 펼치기·접기
@@ -254,6 +338,8 @@ const kindOf = f => {
 };
 // 요양원처럼 사람이 지내는 시설은 시간이 따로 없으므로, 운영 시간 대신 그렇게 알려 줍니다.
 const LIVE_IN = /노인요양시설|거주시설|공동생활|양육시설/;
+// 상세정보 운영 시간 위에 붙는 지금 상태
+const nowHtml = f => { const o = openNow(f); if (!o) return ""; return o.open ? `<span class="now open">${o.always ? "언제든 방문할 수 있어요" : "지금 운영 중 · " + o.until + "까지"}</span>` : `<span class="now closed">${o.holiday ? "오늘은 공휴일이라 쉬어요" : o.breakUntil ? "지금은 점심·쉬는 시간 · " + o.breakUntil + "부터" : "지금은 운영 시간이 아니에요"}</span>`; };
 const hoursHtml = (h, f) => !h && f && LIVE_IN.test(f.type) ? '24시간 생활하는 시설입니다.<span class="sub">(면회·상담 시간은 전화로 확인하세요)</span>' : h ? (({ main, extra }) => esc(main) + (extra ? `<span class="sub">(${esc(extra)})</span>` : ""))(hoursParts(h))
   : '<span class="none">아직 확인하지 못했습니다. 방문 전에 전화로 확인하세요.</span>';
 // "깐풍활전복 28,000원 (대표)" → 이름, 가격, 대표 여부
@@ -316,7 +402,7 @@ function openDetail(f) {
     ${photos}
     ${kind === "safety" ? "" : hot ? `
     <div class="summary">
-      <p class="hours first"><b>운영 시간</b><span>${!f.hours && /^(거리|공원|산책로)(·|$)/.test(f.type) ? "거리·공원이라 따로 정한 운영 시간이 없습니다.<span class=\"sub\">(안에 있는 가게·시설은 저마다 다릅니다)</span>" : hoursHtml(f.hours, f)}</span></p>
+      <p class="hours first"><b>운영 시간</b><span>${nowHtml(f)}${!f.hours && /^(거리|공원|산책로)(·|$)/.test(f.type) ? "거리·공원이라 따로 정한 운영 시간이 없습니다.<span class=\"sub\">(안에 있는 가게·시설은 저마다 다릅니다)</span>" : hoursHtml(f.hours, f)}</span></p>
       ${f.menu ? `<p class="menu-title"><b>메뉴</b></p>
       <ul class="menu">${f.menu.map(menuItem).map(([n, p, best]) => `<li><span>${esc(n)}${best ? ' <span class="best">대표</span>' : ""}</span><span class="price">${esc(p)}</span></li>`).join("")}</ul>
       <p class="menu-note">네이버 플레이스 메뉴${f.menuDate ? ` (${esc(f.menuDate.replace(/-/g, "."))} 기준)` : ""}. 가격은 바뀔 수 있습니다.</p>` : ""}
@@ -324,7 +410,7 @@ function openDetail(f) {
     <div class="summary">
       ${f.target ? `<p><b>대상</b>${esc(f.target)}</p>` : ""}
       ${f.service ? `<p><b>하는 일</b></p><ul>${f.service.split(/,\s*(?![^()]*\))/).map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
-      <p class="hours"><b>운영 시간</b><span>${hoursHtml(f.hours, f)}</span></p>
+      <p class="hours"><b>운영 시간</b><span>${nowHtml(f)}${hoursHtml(f.hours, f)}</span></p>
     </div>
     ${f.how ? `<h3>이용 방법</h3><p class="how">${esc(f.how)}</p>` : ""}`}
     ${f.private ? "" : `<table class="info-table${kind === "welfare" || kind === "shelter" ? "" : " short"}">

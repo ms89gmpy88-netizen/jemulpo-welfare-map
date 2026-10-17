@@ -253,7 +253,7 @@ button { font: inherit; color: inherit; }
   .top { padding: 0.65rem 0.85rem; }
   .brand { flex-basis: 100%; }
   .search-box { flex-basis: 100%; max-width: none; }
-  .rail { position: sticky; top: 0; z-index: 10; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); }
+  .rail { position: sticky; top: 0; z-index: 10; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid var(--line); }
   .rail button { min-height: 3.75rem; font-size: 0.8rem; }
   .filters { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--line); }
   .filters h2 { display: none; }
@@ -464,3 +464,32 @@ button { font: inherit; color: inherit; }
 /* 상세정보 맨 아래: 정보 확인일 */
 .dbody .checked { margin: 1.5rem 0 0; padding-top: 0.9rem; border-top: 1px solid var(--line); font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
 .dbody .checked b { color: var(--ink); font-weight: 700; }
+
+/* 목록 제목 줄: '지금 문 연 곳만' 버튼 */
+.list-title-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+.list-title-row h2 { margin: 0; }
+.open-toggle {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  min-height: 44px; padding: 0 0.9rem;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  font-size: 0.92rem; font-weight: 700; color: var(--ink); cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+.open-toggle:hover { border-color: var(--ink); }
+.open-dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--muted); }
+.open-toggle[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.open-toggle[aria-pressed="true"] .open-dot { background: #8be0b8; }
+.list-head .near-msg { margin-top: 0.5rem; }
+/* 목록 줄·상세정보의 '지금 운영 중' 표시 */
+.open-badge { display: inline-block; font-size: 0.78rem; font-weight: 700; padding: 0 0.45rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent-strong); margin-right: 0.15rem; }
+.summary .now { display: block; width: fit-content; margin-bottom: 0.2rem; font-size: 0.9rem; font-weight: 700; padding: 0.05rem 0.55rem; border-radius: 999px; }
+.summary .now.open { background: var(--accent); color: #fff; }
+.summary .now.closed { background: var(--surface); color: var(--muted); border: 1px solid var(--line); }
+/* 도움 찾기: 체크박스 줄에 색 점 대신 같은 모양 유지 */
+.filters.need-mode .filters-note { margin: 0 0.25rem 0.6rem; }
+.filters.need-mode { display: flex; flex-direction: column; }
+.filters.need-mode h2 { order: -2; }
+.filters.need-mode .filters-note { order: -1; }
+@media (max-width: 899px) {
+  .rail button { padding: 0.5rem 0.1rem; font-size: 0.78rem; }
+}
