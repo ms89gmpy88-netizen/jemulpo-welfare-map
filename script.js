@@ -252,7 +252,9 @@ const kindOf = f => {
   if (ids.includes("shelter")) return "shelter";
   return "safety";
 };
-const hoursHtml = h => h ? (({ main, extra }) => esc(main) + (extra ? `<span class="sub">(${esc(extra)})</span>` : ""))(hoursParts(h))
+// 요양원처럼 사람이 지내는 시설은 시간이 따로 없으므로, 운영 시간 대신 그렇게 알려 줍니다.
+const LIVE_IN = /노인요양시설|거주시설|공동생활|양육시설/;
+const hoursHtml = (h, f) => !h && f && LIVE_IN.test(f.type) ? '24시간 생활하는 시설입니다.<span class="sub">(면회·상담 시간은 전화로 확인하세요)</span>' : h ? (({ main, extra }) => esc(main) + (extra ? `<span class="sub">(${esc(extra)})</span>` : ""))(hoursParts(h))
   : '<span class="none">아직 확인하지 못했습니다. 방문 전에 전화로 확인하세요.</span>';
 // "깐풍활전복 28,000원 (대표)" → 이름, 가격, 대표 여부
 const menuItem = s => { const m = s.match(/^(.*?)\s+([\d,]+원~?|변동|시가)( \(대표\))?$/); return m ? [m[1], m[2], !!m[3]] : [s, "", false]; };
@@ -263,15 +265,17 @@ function accessHtml(f) {
   const conv = (f.conv || "").split(",").map(s => s.trim()).filter(Boolean);
   const a = f.access || {};
   const rows = [
-    ["휠체어 출입", f.wheel ? "가능 (네이버 플레이스 표시)" : a["휠체어 출입"]],
+    // 장애인편의시설 자료(공공데이터)가 있으면 그것을 먼저, 없으면 지도 앱(네이버·카카오) 표시
+    ["휠체어 출입", a["휠체어 출입"] && a["휠체어 출입"] !== "자료에 없음" ? a["휠체어 출입"] : f.wheel ? "가능 (네이버 플레이스 표시)" : a["휠체어 출입"]],
     ["엘리베이터", a["엘리베이터"]],
-    ["주차", conv.includes("발렛파킹") ? "가능 (발렛파킹)" : conv.includes("주차") ? "가능" : a["주차"]],
+    ["주차", conv.includes("발렛파킹") ? "가능 (발렛파킹)" : conv.includes("무료 주차") ? "가능 (무료)" : conv.includes("주차") ? "가능" : a["주차"]],
     ["장애인 화장실", a["장애인 화장실"]],
   ];
+  if (conv.includes("장애인 편의시설")) rows.push(["장애인 편의시설", "있음 (지도 앱 표시)"]);
   if (conv.includes("남/녀 화장실 구분")) rows.push(["화장실", "남녀 따로"]);
-  const rest = conv.filter(s => !["주차", "발렛파킹", "남/녀 화장실 구분"].includes(s));
+  const rest = conv.filter(s => !["주차", "무료 주차", "발렛파킹", "남/녀 화장실 구분", "장애인 편의시설"].includes(s));
   if (rest.length) rows.push(["그 밖에", rest.join(", ")]);
-  const src = [a["출처"], (f.conv || f.wheel) && "네이버 플레이스 편의 정보(2026-10-17)"].filter(Boolean);
+  const src = [a["출처"], (f.conv || f.wheel) && (f.convSrc || "네이버 플레이스 편의 정보(2026-10-17)")].filter(Boolean);
   // 네이버 정보만 있으면 엘리베이터·장애인 화장실 줄은 빼서 '정보 없음'이 줄줄이 나오지 않게 합니다.
   const shown = a["출처"] ? rows : rows.filter(([, v]) => v);
   return `<h3>이용 편의</h3>
@@ -312,7 +316,7 @@ function openDetail(f) {
     ${photos}
     ${kind === "safety" ? "" : hot ? `
     <div class="summary">
-      <p class="hours first"><b>운영 시간</b><span>${!f.hours && /^(거리|공원|산책로)(·|$)/.test(f.type) ? "거리·공원이라 따로 정한 운영 시간이 없습니다.<span class=\"sub\">(안에 있는 가게·시설은 저마다 다릅니다)</span>" : hoursHtml(f.hours)}</span></p>
+      <p class="hours first"><b>운영 시간</b><span>${!f.hours && /^(거리|공원|산책로)(·|$)/.test(f.type) ? "거리·공원이라 따로 정한 운영 시간이 없습니다.<span class=\"sub\">(안에 있는 가게·시설은 저마다 다릅니다)</span>" : hoursHtml(f.hours, f)}</span></p>
       ${f.menu ? `<p class="menu-title"><b>메뉴</b></p>
       <ul class="menu">${f.menu.map(menuItem).map(([n, p, best]) => `<li><span>${esc(n)}${best ? ' <span class="best">대표</span>' : ""}</span><span class="price">${esc(p)}</span></li>`).join("")}</ul>
       <p class="menu-note">네이버 플레이스 메뉴${f.menuDate ? ` (${esc(f.menuDate.replace(/-/g, "."))} 기준)` : ""}. 가격은 바뀔 수 있습니다.</p>` : ""}
@@ -320,7 +324,7 @@ function openDetail(f) {
     <div class="summary">
       ${f.target ? `<p><b>대상</b>${esc(f.target)}</p>` : ""}
       ${f.service ? `<p><b>하는 일</b></p><ul>${f.service.split(/,\s*(?![^()]*\))/).map(s => `<li>${esc(s)}</li>`).join("")}</ul>` : ""}
-      <p class="hours"><b>운영 시간</b><span>${hoursHtml(f.hours)}</span></p>
+      <p class="hours"><b>운영 시간</b><span>${hoursHtml(f.hours, f)}</span></p>
     </div>
     ${f.how ? `<h3>이용 방법</h3><p class="how">${esc(f.how)}</p>` : ""}`}
     ${f.private ? "" : `<table class="info-table${kind === "welfare" || kind === "shelter" ? "" : " short"}">
@@ -343,7 +347,8 @@ function openDetail(f) {
     <p class="actions">
       <a class="pin-btn" id="detail-transit" href="https://map.kakao.com/link/to/${encodeURIComponent(f.name)},${f.lat},${f.lng}" target="_blank" rel="noopener">${icon("bus")}대중교통 길찾기</a>
       <button class="pin-btn" type="button" id="detail-map">${icon("pin")}지도에서 보기</button>
-    </p>` : ""}`;
+    </p>` : ""}
+    ${f.checkedAt ? `<p class="checked">정보 확인일: <b>${esc(f.checkedAt.replace(/^(\d{4})-(\d\d)-(\d\d)$/,(m, y, mo, d) => `${y}년 ${+mo}월 ${+d}일`))}</b><br><span>${esc(f.checkedWhat || "")}. 그 뒤에 바뀌었을 수 있으니 방문 전에 전화로 확인하세요.</span></p>` : ""}`;
   if (wide) document.getElementById("list").scrollTop = 0;
   else { if (!dialog.open) dialog.showModal(); dialog.scrollTop = 0; }
   document.getElementById("detail-back")?.addEventListener("click", closeDetail);

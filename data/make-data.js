@@ -125,6 +125,31 @@ facilities.forEach(f => {
   if (p["휠체어출입"]) f.wheel = p["휠체어출입"];
   if (p["메뉴"]) [f.menu, f.menuDate] = [p["메뉴"].split(" | "), p["메뉴확인일"]];
 });
+// 복지시설: 네이버 플레이스·카카오맵 편의 정보(장애인 편의시설·주차·화장실 등, 2026-10-17)
+const wconv = Object.fromEntries(parse("복지시설편의.csv").map(r => [r["시설명"], r]));
+facilities.forEach(f => {
+  const w = wconv[f.name];
+  if (!w || f.conv) return;
+  if (w["편의"]) f.conv = w["편의"];
+  if (w["휠체어출입"]) f.wheel = w["휠체어출입"];
+  f.convSrc = w["출처"];
+});
+const wconvMissing = Object.keys(wconv).filter(n => !facilities.some(f => f.name === n));
+if (wconvMissing.length) console.log("복지시설편의.csv에만 있고 목록에 없는 이름: " + wconvMissing.join(", "));
+
+// 정보 확인일: 확인일.csv(그날 다시 맞춰 본 곳), 없으면 자료를 모은 날
+const checkedAt = Object.fromEntries(parse("확인일.csv").map(r => [r["시설명"], r]));
+const isGroup = (f, list) => f.categories.some(c => list.includes(c));
+facilities.forEach(f => {
+  const c = checkedAt[f.name];
+  if (c) [f.checkedAt, f.checkedWhat] = [c["확인일"], c["확인한 내용"]];
+  else if (isGroup(f, ["관광명소", "맛집", "분위기 좋은 카페"])) [f.checkedAt, f.checkedWhat] = ["2026-10-17", "네이버 플레이스 장소 정보(운영 시간·메뉴·편의)"];
+  else if (isGroup(f, ["경찰서", "해양경찰서", "소방서"])) [f.checkedAt, f.checkedWhat] = ["2026-10-17", "기관 홈페이지와 카카오맵·네이버 플레이스"];
+  else if (isGroup(f, ["어르신", "장애인", "여성/아동", "한부모/다문화", "복지관/자활", "건강/재활"])) [f.checkedAt, f.checkedWhat] = ["2026-10-16", "제물포구청·인천시 자료와 기관 홈페이지로 주소·전화 확인"];
+  else [f.checkedAt, f.checkedWhat] = ["2026-10-16", "국민안전24 대피시설 자료"];
+});
+const checkedMissing = Object.keys(checkedAt).filter(n => !facilities.some(f => f.name === n));
+if (checkedMissing.length) console.log("확인일.csv에만 있고 목록에 없는 이름: " + checkedMissing.join(", "));
 const placeMissing = Object.keys(place).filter(n => !facilities.some(f => f.name === n));
 if (placeMissing.length) console.log("핫플레이스상세.csv에만 있고 목록에 없는 이름: " + placeMissing.join(", "));
 

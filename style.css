@@ -460,3 +460,7 @@ button { font: inherit; color: inherit; }
 @media (max-width: 899px) and (max-height: 700px) {
   .map { height: 36vh; }
 }
+
+/* 상세정보 맨 아래: 정보 확인일 */
+.dbody .checked { margin: 1.5rem 0 0; padding-top: 0.9rem; border-top: 1px solid var(--line); font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+.dbody .checked b { color: var(--ink); font-weight: 700; }
